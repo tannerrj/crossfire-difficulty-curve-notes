@@ -8,7 +8,7 @@
 
 **The definition of "new mechanic" is where Crossfire is worst hit.** The article counts new enemy types, new abilities, new item rules, and old mechanics used in novel ways. Crossfire's mechanic surface is enormous — skills, praying and god-granted powers, spell paths, resistances and immunities, item power limits, alchemy, marking runes, dragon players, weapon improvement — and the game teaches almost none of it in-game. The de facto teaching modality is the wiki and asking on IRC. That is exactly the failure the article describes. Expanded below.
 
-**"It is impossible to make a game for everyone."** Crossfire has implicitly targeted one archetype for 30 years: the player who reads external documentation and enjoys opaque systems. That is a legitimate choice, but it should be a //decision//, not an accident, and it should be stated so map authors design toward it consistently.
+**"It is impossible to make a game for everyone."** Crossfire has implicitly targeted one archetype for 30 years: the player who reads external documentation and enjoys opaque systems. That is a legitimate choice, but it should be a //decision//, not an accident, and it should be stated so map authors design toward it consistently. Expanded below.
 
 **Don't punish failure with increased difficulty.** Crossfire's death penalty is exp loss plus stat depletion — the player who just failed is now measurably weaker facing the same content. This is the article's explicit "don't," and it is baked into the engine rather than the maps, so it is a server-side conversation, not a map one.
 
@@ -144,6 +144,86 @@ end
 ==== Making it measurable ====
 
 This list has the same problem as the rest of the article — it is all taste until something counts it. The counting is cheap here: teaching objects are archetypes, so a scan for ''magic_mouth'', ''rune_mark'', ''sign'', and ''knowledge_marker'' per map is the same kind of pass [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already makes for monsters and treasure. Cross that count against the map's ''difficulty'' and its monster list and the output is a short list of maps that are hard and say nothing, which is the actual thing worth fixing.
+
+===== Who Crossfire is actually for, expanded =====
+
+The article's point is that trying to serve everybody produces a game that serves nobody, so pick your player and design for them. Crossfire has picked one, just never out loud: somebody who will alt-tab to a wiki, keep notes, tolerate a system that does not explain itself, and treat working out the rules as part of the game. Thirty years of content has been built for that person by people who are that person.
+
+The trap is assuming the only alternative is to dumb the game down. It is not, and conflating the two is what keeps this conversation from going anywhere. Opacity is not depth. A fire elemental being immune to fire is depth. A fire elemental being immune to fire //and the game never saying so anywhere// is opacity, and removing the second changes nothing about the first. Every example below keeps the systems exactly as they are and only changes what the game is willing to tell you about them.
+
+==== Serving the archetype without requiring it ====
+
+The structural answer is layering: information the curious player can pull, rather than a lecture pushed at everybody. That costs the veteran nothing, because a veteran does not read the sign.
+
+**Make the depth opt-in, not mandatory.** An NPC with ''@match'' dialogue is the cleanest version of this in the engine. The player who wants to be told can ask; the player who wants to work it out walks past and never sees the text. The same map serves both, which is the closest anybody gets to beating the article's rule. ''scorn/misc/beginners_entry'' already does this - the ''@question'' and ''@reply'' lines advertise what is askable, so a curious player can pull three layers deep and everyone else can ignore it.
+
+**State the target, not the answer.** A sign at a dungeon entrance reading "the guard captain lost six men in here, all of them better armed than you" tells a level 5 character to come back later without revealing a single mechanic. Danger signalling and mechanic teaching are separate jobs, and the first one is uncontroversial - nobody's sense of discovery is ruined by knowing a dungeon is deadly.
+
+**Two doors into the same content.** Where a dungeon has a punishing route and a slower safe one, say so at the fork and let the player choose their own difficulty. This is player-authored difficulty selection with no engine support required, and it does not fragment the playerbase across separate content the way difficulty settings would.
+
+**Let the game keep the notes.** ''knowledge_marker'' is the in-game replacement for a spoiler file. The player still has to find the book, kill the thing, or ask the right NPC - the discovery loop is intact - but what they discover is recorded in-game instead of in a browser tab. This is the single most important idea in these notes: the goal is not to remove the spoiler file, it is to move it inside the game where it can be earned.
+
+**Gate the consequence, not the information.** A teaching room where the gimmick cannot kill you, followed by the real encounter where it can. The lesson stays discovered rather than told, and the player who already knows loses ten seconds walking through room one.
+
+**Say who the region is for.** Region-level and entrance-level level guidance costs nothing and lets a player self-select. An explicitly flagged "no hand-holding past this point" area is a legitimate design statement, and stating it is what turns the archetype from an accident into a decision.
+
+==== Games in the same position ====
+
+Crossfire is not unusual here, and the useful part is what each of these did about it.
+
+**NetHack.** The archetype, and the reason "spoiler file" is a genre term. In-game there is ''#help'', an oracle selling vague hints, and not much else; the actual manual is a community-maintained pile of text files. Its community treats reading them as part of playing rather than as a failure, which is the same position Crossfire occupies by default. Worth knowing that this is a defensible end state - it just should be chosen.
+
+**Dungeon Crawl Stone Soup.** The instructive one. It forked from Linley's Dungeon Crawl and its design documents treat spoiler-dependence as a bug: content whose correct play required knowing something the game never showed you got reworked or removed, and in-game monster and item descriptions are detailed enough that examining a thing tells you how it fights. Crawl did not get easier. It got legible. That distinction is the whole argument, and Crawl is the closest thing to a proof that a roguelike community can make this decision without losing its identity.
+
+**Dwarf Fortress.** The extreme case for over a decade - enormous simulation, an interface that told you almost nothing, a wiki that was mandatory equipment. The 2022 commercial release added a tutorial and rebuilt the interface without simplifying the simulation underneath it. Depth and opacity came apart cleanly, which is the counterexample to hand anyone who argues that explaining Crossfire would ruin it.
+
+**Caves of Qud.** Built modern with the teaching inside the game: item, mutation, and effect descriptions state their actual mechanics, and the setting is delivered as in-world text rather than as an out-of-game manual. Still deeply strange, still punishing. Roughly the target state for a Crossfire that keeps its character.
+
+**EVE Online.** The closest structural match - persistent, shared economy, no way to scale difficulty per player without breaking fairness, which is the same corner the article's "magic sauce" section puts Crossfire in. Also the cautionary tale: it never solved the out-of-game problem, and third-party tools and spreadsheets became part of the effective client. Its partial answers were tutorial chains and career agents, which is to say teaching content placed inside the world.
+
+**Angband and ADOM** are the near relatives - same lineage, same reliance on external spoiler files, same "you had to know" moments - and **Path of Exile** is the endpoint worth avoiding, where an external build planner is not optional and everyone has quietly agreed that the game ships incomplete.
+
+==== Where a player has to go today ====
+
+For completeness, the current reading list, none of which is reachable from inside the game:
+
+  * [[https://crossfire.real-time.com/|crossfire.real-time.com]] - the project site: downloads, mailing list archives, generated code documentation.
+  * [[https://wiki.cross-fire.org/|wiki.cross-fire.org]] - the DokuWiki wiki, and the de facto manual.
+  * [[https://forum.cross-fire.org|forum.cross-fire.org]] - the forum.
+  * [[https://www.crossfireatlas.net/|crossfireatlas.net]] - the Crossfire Atlas, for rendered world maps.
+  * [[https://sourceforge.net/projects/crossfire/|SourceForge]] - releases, bug tracker, feature requests, patches.
+  * IRC ''#crossfire'' on irc.libera.chat (web portal at [[https://crossfire.real-time.com/irc/|crossfire.real-time.com/irc]]) and Discord at [[https://crossfire.real-time.com/discord|crossfire.real-time.com/discord]].
+  * The ''crossfire'' mailing list at [[http://mailman.metalforge.org/mailman/listinfo/crossfire|mailman.metalforge.org]].
+  * Shipped in the server source and read by almost nobody: ''doc/survival-guide.txt'' (178 lines), ''doc/skills.txt'' (443 lines), ''doc/runes-guide.txt'', ''doc/spoiler'', and the LaTeX Playbook in ''doc/playbook''.
+
+That last line is the one worth staring at. A survival guide and a 443-line skills reference already exist, already written, sitting in a tarball that players never unpack.
+
+==== What has to change to move the source in-game ====
+
+The gap is smaller than it looks, because most of the machinery is already built and idle.
+
+**The topical help slot exists and is empty.** ''server/c_misc.cpp'' has three help categories: commands, wiz commands, and //misc//. The misc branch reads ''$datadir/mischelp'' - and that directory does not exist in the tree. ''opendir'' fails, the function returns silently, and ''help topics'' prints an empty "Misc help:" line. The engine has a purpose-built home for exactly the documentation these notes say is missing, and nobody has ever put anything in it.
+
+**And it is not wired up anyway.** ''find_help_file()'' searches ''wizhelp'' and ''help'' only. Drop a file into ''mischelp'' today and it would be //listed// under "Misc help" and still be unreadable, because ''help <topic>'' would not find it. Two more ''find_help_file_in()'' calls fixes that. It is the smallest engine change on this list and it unblocks all of the rest.
+
+**All 96 help topics are commands.** Everything in ''lib/help'' documents the interface: ''apply'', ''bind'', ''pickup'', ''shoottype''. Not one documents the world. There is no ''itempower'', no ''paths'', no ''praying'', no ''resistances'', no ''curse'', no ''literacy'', no ''encumbrance'', no ''alchemy''. A player can learn every keystroke in the game and still not be told that armour weight costs them spell point regeneration.
+
+**The starting help page is eight lines.** ''lib/def_help'' explains how to use ''help'' and how to file a bug. That is the game's front door for a new player, and it points at a topic list that is entirely commands.
+
+**Nobody finds out ''knowledge'' exists.** ''server/knowledge.cpp'' prints a one-time hint about the ''knowledge'' command the first time a player is granted any knowledge at all. With three files in the map set using ''knowledge_marker'', most players are never granted any, so they never see the hint, so the feature is invisible. It is circular, and the map side is what breaks the loop.
+
+**Help text is already clickable.** ''help_topics()'' wraps every entry in ''[help]...[/help]'' markup so clients can render topics as links. The presentation layer is done. This argues for writing the content, since it will not land as a wall of terminal text.
+
+Ordered by cost, the work looks like this:
+
+  - Add the two ''find_help_file_in("mischelp", ...)'' calls so topical help resolves at all.
+  - Create ''lib/mischelp'' and convert ''doc/survival-guide.txt'', ''doc/skills.txt'', and ''doc/runes-guide.txt'' into topic files. The text exists; this is editing, not writing.
+  - Write the missing mechanic topics - item power, spell paths, praying and gods, resistances, curses, literacy, encumbrance, alchemy, weapon improvement - following the existing ''.en'' and ''.fr'' naming convention.
+  - Rewrite ''lib/def_help'' to point a new player at the mechanic topics first and the command list second.
+  - Start attaching ''knowledge_marker'' to the signs and books that already describe monsters, gods, and recipes, so the knowledge system stops being invisible.
+  - Give new characters one readable in-game item that says the ''help'' and ''knowledge'' commands exist.
+
+None of that removes a single system, changes a single monster, or makes the game easier. It changes the game from one that requires a second screen into one that merely rewards it, and the archetype in line one is still the player it is built for.
 
 ===== What does not apply cleanly =====
 
