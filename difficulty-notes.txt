@@ -1,6 +1,6 @@
 ====== Difficulty Curves (davetech.co.uk) Applied to Crossfire ======
 
-The article is written for linear single-player platformers, so some of it maps onto Crossfire directly and some of it fights Crossfire's basic shape. Here is the split.
+[[https://www.davetech.co.uk/difficultycurves|The article]] is written for linear single-player platformers, so some of it maps onto Crossfire directly and some of it fights Crossfire's basic shape. Here is the split.
 
 ===== What applies =====
 
@@ -28,9 +28,9 @@ The article is written for linear single-player platformers, so some of it maps 
 
 ===== What Crossfire should actually adopt =====
 
-  - **Audit the ''difficulty'' header against map contents.** Roughly 1,120 of ~1,220 maps in the city regions set ''difficulty'' by hand, with no cross-author consistency, and the field drives treasure generation (the server computes it from monster experience only when it is unset). A report comparing each map's declared difficulty against its actual monster exp/level content, flagging outliers, is the single highest-value change here — and ''map_report.sh'' already does the scanning half of that job.
+  - **Audit the ''difficulty'' header against map contents.** Roughly 1,120 of ~1,220 maps in the city regions set ''difficulty'' by hand, with no cross-author consistency, and the field drives treasure generation (the server computes it from monster experience only when it is unset). A report comparing each map's declared difficulty against its actual monster exp/level content, flagging outliers, is the single highest-value change here — and [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half of that job.
   - **Aggregate death locations.** The server logs player deaths; rolling those up per map and per coordinate gives you the article's evenly-distributed-deaths test with real data instead of opinion. This turns "that dungeon feels unfair" into a heatmap. Everything else on this list gets easier once it exists.
-  - **Signal danger before the door.** Crossfire dungeon entrances are anonymous holes in the ground. The article's "subtle graphical hints" translate to sign objects, entrance-adjacent corpses and wreckage, and map ''msg'' blocks — cheap, purely map-side, no engine work. ''world_entrance_report.py'' already enumerates entrances, so the coverage gap is measurable.
+  - **Signal danger before the door.** Crossfire dungeon entrances are anonymous holes in the ground. The article's "subtle graphical hints" translate to sign objects, entrance-adjacent corpses and wreckage, and map ''msg'' blocks — cheap, purely map-side, no engine work. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable.
   - **Teach at the point of need, using the modalities that already exist.** Signs, books, NPC ''@match'' dialogue, map ''msg'', and region ''msg'' in ''regions.reg'' are all in the engine today and underused. A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
   - **Give each dungeon a teaching room.** If a map's gimmick is spell-reflecting monsters, invisibility, or a timed gate, room one should demonstrate it somewhere survivable. This is a map-authoring convention, not code — worth writing into ''Info/mapguide''.
   - **Keep doing what the recent altar work does.** The last several commits added second altars to temples for multi-player friendliness. That is the article's "player diversity" principle applied without being told to — reducing contention so different player populations can use the same content. The same instinct should extend to chokepoints in quest maps.
