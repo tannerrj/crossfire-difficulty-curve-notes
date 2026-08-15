@@ -6,7 +6,7 @@
 
 **The "difficulty saw" instead of a curve.** This is the article's core idea and it applies cleanly at the //map-set// level, not the game level. Crossfire has no global curve — it is an open world where a level 3 character can walk out of Scorn and into something that kills them instantly. But every individual dungeon, tower, or quest chain is a small linear experience, and those absolutely should dip when they introduce their gimmick and then rise. Most Crossfire dungeons open at full intensity on room one.
 
-**The definition of "new mechanic" is where Crossfire is worst hit.** The article counts new enemy types, new abilities, new item rules, and old mechanics used in novel ways. Crossfire's mechanic surface is enormous — skills, praying and god-granted powers, spell paths, resistances and immunities, item power limits, alchemy, marking runes, dragon players, weapon improvement — and the game teaches almost none of it in-game. The de facto teaching modality is the wiki and asking on IRC. That is exactly the failure the article describes.
+**The definition of "new mechanic" is where Crossfire is worst hit.** The article counts new enemy types, new abilities, new item rules, and old mechanics used in novel ways. Crossfire's mechanic surface is enormous — skills, praying and god-granted powers, spell paths, resistances and immunities, item power limits, alchemy, marking runes, dragon players, weapon improvement — and the game teaches almost none of it in-game. The de facto teaching modality is the wiki and asking on IRC. That is exactly the failure the article describes. Expanded below.
 
 **"It is impossible to make a game for everyone."** Crossfire has implicitly targeted one archetype for 30 years: the player who reads external documentation and enjoys opaque systems. That is a legitimate choice, but it should be a //decision//, not an accident, and it should be stated so map authors design toward it consistently.
 
@@ -17,6 +17,133 @@
 **Adrenaline pacing and backward callbacks.** Both apply to dungeon layout and to the quest system. A quest chain that revisits an earlier obstacle with the player's new tools is well within what staged ''.quests'' definitions already support.
 
 **Monitoring.** Death-location tracking and completion drop-off are the article's most actionable ideas and the ones Crossfire has never done systematically.
+
+===== The mechanic surface, expanded =====
+
+Two different things get called "too hard" and only one of them is a difficulty problem. A player who dies to a monster that hits harder than they can heal has learned something and can act on it next time. A player whose fireball does nothing to a fire elemental, whose magic bullet bounces off a level 6 gnome, or who cannot wear the artifact they just spent an hour earning has learned nothing at all — the game told them nothing, so they alt-tab to the wiki or they stop playing. That is a teaching failure, not a tuning failure, and no amount of difficulty rebalancing fixes it.
+
+Split the surface three ways, because who can fix it differs for each.
+
+==== 1. Local mechanics - the map that uses it should teach it ====
+
+These are specific to the content in front of the player, so the map introducing the problem is the map that owes them the explanation.
+
+**Resistances and immunities.** ''fire_elemental'' carries ''resist_fire 100''. A pyromancer can empty their entire mana pool into one and nothing happens, with no message distinguishing "immune" from "you missed."
+
+**Spell reflection.** ''gnome'' is level 6 with ''reflect_spell 1'', which means it is content a brand new spellcaster meets, and their own bolt comes back at them with no explanation offered. Angels and nazgul do the same thing at the other end of the level range.
+
+**Attacktype gating.** Monsters that only take damage from magic or blessed weapons, undead that need the right attacktype, ''slaying'' matches that make one weapon in the player's pack five times better than the one they are holding.
+
+**Terrain and timed obstacles.** Gates on a cycle, teleporters, moving walls, spinners — anything where the correct play is to stand still and watch for ten seconds, which is the opposite of what a player under pressure does.
+
+**Quest-item handling.** ''check_inv'' gates keyed on ''slaying'', marking runes, and NPC ''@match'' keywords that cannot be guessed from anything visible in the map.
+
+==== 2. Character-wide mechanics - start areas, temples, and guild NPCs ====
+
+These are not specific to any one dungeon, so teaching them in every dungeon is noise. They belong once, in a place the player passes through early, and again at the point of first contact.
+
+**Skills and literacy** (you need the skill object before the action works, and books silently refuse readers without literacy), **praying and gods** (converting, grace regeneration, what a god actually grants), **spell paths** (attuned, repelled, and denied, including paths your own god denies), **item power** (the level-relative cap on worn equipment), **curses and damnation**, **alchemy and weapon improvement** (both are multi-step sequences with irreversible failure states), and **encumbrance** (armour weight costing you speed and spell point regeneration).
+
+==== 3. Engine-side - not a map author's problem ====
+
+The death penalty, the wording of refusal messages, and the general absence of a "that did nothing, and here is why" feedback line. Worth listing separately so nobody tries to paper over them with signs.
+
+==== What the engine already hands a map author ====
+
+The modalities are all there, but they are not equal, and two of the ones commonly cited do not fire on their own.
+
+**''arch magic_mouth''** — type 98, ''invisible 1'', ''move_on walk fly_low'', and it honours ''connected'', so a lever or pressure plate can fire it. Un-missable, leaves nothing on the floor, and the lesson can be timed to the moment it matters. This is the best teaching object in the game and it is mostly used for jokes.
+
+**''arch rune_mark''** — the same type and the same walk trigger, but visible. Use it when the player should see that something was deliberately left here. ''scorn/misc/beginners2'' uses one exactly right: "If you enter this corridor and don't react fast, you will die!"
+
+**''arch sign''** — needs an ''apply'', so it can be walked past, but it has no skill requirement and no level check, which makes it the safe choice for anything a level 1 character must not miss. Set ''food'' to limit the number of reads (unset means unlimited).
+
+**Books** — portable and re-readable, but ''types/book/book.cpp'' requires the skill named in the book's ''skill'' field and compares the book's ''level'' against the reader's skill level plus 5. A new player without literacy gets "You are unable to decipher the strange symbols" and walks away with nothing. NOTE: if you teach with a book, set ''level 0'', and never put a required lesson in one.
+
+**NPC ''@match'' dialogue** — the richest option and the only one that rewards a player for asking the right question. ''scorn/misc/beginners_entry'' is the model: several synonyms per ''@match'', ''@question'' and ''@reply'' lines advertising the follow-ups, and a ''@match *'' fallback. The failure mode is the player who never types anything, so dialogue supplements a lesson, it does not carry one.
+
+**Map ''msg'' and region ''msg''** — correcting the list further down: neither displays automatically. ''server/c_misc.cpp'' prints the map's ''msg'' only from ''mapinfo'' and the region's only from ''whereami''. They are flavour for players who already poke at commands, not a teaching channel for someone who does not know the commands exist.
+
+**''knowledge_marker''** — the one that should be everywhere and is not. Put ''knowledge_marker monster:fire_elemental'' on a sign, rune, or book and reading it permanently adds that monster to the player's ''knowledge'' list, complete with the description the server generates from the archetype (attacktypes, resistances, abilities). Valid prefixes are ''monster:'', ''god:'', ''alchemy:'', and ''message:'', multiple entries separated by ''/''. Grep the entire map set and three files use it — ''start/newbieshouse'', ''quests/peterm/FireTemple/FourthFloor'', and one python command. That is the largest piece of unused teaching machinery in the game, and it is the only one whose lesson survives the player logging out.
+
+==== Worked examples ====
+
+All map-side, no engine work, no new archetypes.
+
+**1. The immunity that eats your only attack.** A fire dungeon full of ''fire_elemental''. Put a burned-out camp on the approach square with an invisible mouth over it, so the player is told before they commit mana rather than after.
+
+<code>
+arch magic_mouth
+msg
+Three bodies, and the scorching runs outward from them, not inward.
+Whatever finished them here, it was not the fire they were throwing.
+endmsg
+knowledge_marker monster:fire_elemental
+x 5
+y 3
+end
+</code>
+
+The ''msg'' handles the immediate decision. The ''knowledge_marker'' handles the next character the player rolls, and the one after that.
+
+**2. Demonstrate the gimmick, do not describe it.** For a spell-reflection map, room one gets a single ''gnome'' in an alcove the player can shoot into but not walk into, with a retreat corridor behind them and a rune on the approach tile. The player fires one bolt, watches it come back, takes a survivable amount of damage, and now understands ''reflect_spell'' permanently. A sign saying "these gnomes reflect spells" teaches the same fact and none of the reflex.
+
+<code>
+arch rune_mark
+msg
+Scratched into the floor: "THEY THROW IT BACK - ASK ME HOW I KNOW"
+endmsg
+knowledge_marker monster:gnome
+x 3
+y 8
+end
+</code>
+
+**3. Fire the lesson at the moment it matters.** For a timed gate or a paralysis room, do not put the explanation at the map entrance where it will be forgotten three rooms later. Put a ''magic_mouth'' with ''connected'' on the same trigger as the gate, so the first cycle of the gate is narrated while the player is standing there watching it.
+
+<code>
+arch magic_mouth
+connected 12
+msg
+The gate slams, waits, and grinds open again. Whatever runs it, it is
+counting, not watching.
+endmsg
+x 9
+y 4
+end
+</code>
+
+**4. The artifact you cannot wear.** Item power is a level-relative cap, and the refusal message is engine-side, but the treasure room is not. Put a sign on the pedestal explaining the rule in-world, and put a lower-power alternative on the same square so the trip still pays out for the character who found it early.
+
+<code>
+arch sign
+name inscription on the pedestal
+msg
+"Ward and weight alike answer to the wearer. Bear more than your name
+can carry and it will refuse your hand until you have grown into it."
+Below, in a later hand: the greaves beside it are plainer, and will serve.
+endmsg
+x 12
+y 6
+end
+</code>
+
+**5. Let the player ask before they commit.** Spell paths and god grants are the worst version of this problem, because the cost of finding out is a conversion or a wasted spellbook. A temple NPC with ''@match'' on the god's name, on "path", and on "denied", answering with what the god grants and what it locks out, turns an hour-long mistake into a thirty-second conversation. Hang ''knowledge_marker god:<name>'' off the temple's founding-inscription sign while you are in there, so the answer stays in the player's ''knowledge'' list.
+
+**6. Call the mechanic back later.** This is the article's backward-callback point applied to teaching rather than to layout. If room one taught spell reflection with one caged gnome, the map's late-game room should put reflectors behind a line of ordinary casters, so the player has to re-derive the lesson under pressure. A mechanic taught once and never reused reads as a gimmick; taught once and re-tested twice, it reads as the dungeon having a subject.
+
+==== Conventions worth writing into Info/mapguide ====
+
+  - Any map whose intended solution depends on a mechanic not taught in the start areas must carry an in-map teaching object, and that object goes before the first place the mechanic can kill you.
+  - Where failure is lethal, use ''magic_mouth'' or ''rune_mark'', not a sign. Signs are for lessons the player can afford to walk past.
+  - Never teach a required mechanic with a book alone. Books have a skill and level gate that silently excludes exactly the players who need the lesson.
+  - Any sign, rune, or book that describes a monster's resistances, a god, or a recipe gets the matching ''knowledge_marker''. It costs one line and it is the only teaching that persists.
+  - Demonstrate before you test. One weakened, isolated, escapable instance of the gimmick, then the real encounter.
+  - Set teaching books to ''level 0'' so a level 1 literate character can actually read them.
+
+==== Making it measurable ====
+
+This list has the same problem as the rest of the article — it is all taste until something counts it. The counting is cheap here: teaching objects are archetypes, so a scan for ''magic_mouth'', ''rune_mark'', ''sign'', and ''knowledge_marker'' per map is the same kind of pass [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already makes for monsters and treasure. Cross that count against the map's ''difficulty'' and its monster list and the output is a short list of maps that are hard and say nothing, which is the actual thing worth fixing.
 
 ===== What does not apply cleanly =====
 
@@ -31,7 +158,7 @@
   - **Audit the ''difficulty'' header against map contents.** Roughly 1,120 of ~1,220 maps in the city regions set ''difficulty'' by hand, with no cross-author consistency, and the field drives treasure generation (the server computes it from monster experience only when it is unset). A report comparing each map's declared difficulty against its actual monster exp/level content, flagging outliers, is the single highest-value change here — and [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half of that job.
   - **Aggregate death locations.** The server logs player deaths; rolling those up per map and per coordinate gives you the article's evenly-distributed-deaths test with real data instead of opinion. This turns "that dungeon feels unfair" into a heatmap. Everything else on this list gets easier once it exists.
   - **Signal danger before the door.** Crossfire dungeon entrances are anonymous holes in the ground. The article's "subtle graphical hints" translate to sign objects, entrance-adjacent corpses and wreckage, and map ''msg'' blocks — cheap, purely map-side, no engine work. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable.
-  - **Teach at the point of need, using the modalities that already exist.** Signs, books, NPC ''@match'' dialogue, map ''msg'', and region ''msg'' in ''regions.reg'' are all in the engine today and underused. A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
+  - **Teach at the point of need, using the modalities that already exist.** Signs, marking runes, magic mouths, books, NPC ''@match'' dialogue, and ''knowledge_marker'' are all in the engine today and underused (map ''msg'' and region ''msg'' only surface on ''mapinfo'' and ''whereami'', so they are flavour rather than teaching). A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
   - **Give each dungeon a teaching room.** If a map's gimmick is spell-reflecting monsters, invisibility, or a timed gate, room one should demonstrate it somewhere survivable. This is a map-authoring convention, not code — worth writing into ''Info/mapguide''.
   - **Keep doing what the recent altar work does.** The last several commits added second altars to temples for multi-player friendliness. That is the article's "player diversity" principle applied without being told to — reducing contention so different player populations can use the same content. The same instinct should extend to chokepoints in quest maps.
 
