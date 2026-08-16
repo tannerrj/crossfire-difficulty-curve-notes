@@ -11,3 +11,7 @@
 *.tmp
 .idea/
 .vscode/
+
+# Python bytecode from tools/difficulty-scan
+__pycache__/
+*.pyc
