@@ -363,8 +363,8 @@ def item_gates(mapset, arches, radius=6, **_):
     gated_maps = 0
     by_arch = Counter()
     unexplained_by_arch = Counter()
-    invisible_altars = 0
-    invisible_maps = set()
+    invisible_by_arch = Counter()
+    invisible_maps_by_arch = defaultdict(set)
 
     for path, mapfile in mapset.maps.items():
         gates = mapfile.gates()
@@ -375,9 +375,10 @@ def item_gates(mapset, arches, radius=6, **_):
 
         for obj, required in gates:
             by_arch[obj.arch] += 1
-            if obj.arch == "altar_trigger" and obj.attrs.get("invisible") == "1":
-                invisible_altars += 1
-                invisible_maps.add(path)
+            invisible = obj.attrs.get("invisible") == "1"
+            if invisible:
+                invisible_by_arch[obj.arch] += 1
+                invisible_maps_by_arch[obj.arch].add(path)
 
             words = arches.words_for(required)
             named_by = None
@@ -401,20 +402,31 @@ def item_gates(mapset, arches, radius=6, **_):
             explained = named_by is not None and named_by <= radius
             if not explained:
                 unexplained_by_arch[obj.arch] += 1
-                rows.append((
-                    path, obj.arch, required, obj.x, obj.y,
-                    "yes" if obj.attrs.get("invisible") == "1" else "",
-                    len(teaching),
-                    "" if nearest is None else nearest,
-                    "elsewhere on map" if named_by is not None else "nowhere",
-                ))
+
+            # Every gate gets a row, explained or not, so the CSV is a complete
+            # dataset and every figure in the summary can be re-derived from it
+            # by filtering. Sorting below keeps the unexplained ones on top.
+            if explained:
+                named_where = f"yes, {named_by} tiles away"
+            elif named_by is not None:
+                named_where = f"only {named_by} tiles away, beyond the {radius}-tile radius"
+            else:
+                named_where = "nowhere on this map"
+            rows.append((
+                path, obj.arch, required, obj.x, obj.y,
+                "invisible" if invisible else "visible",
+                len(teaching),
+                "" if nearest is None else nearest,
+                "no" if not explained else "yes",
+                named_where,
+            ))
 
     player_facing = by_arch["altar_trigger"] + by_arch["check_inv"]
     player_unexplained = (unexplained_by_arch["altar_trigger"]
                           + unexplained_by_arch["check_inv"])
     # Per-gate counts are dominated by a handful of maps that stack dozens of
     # altars on one square, so the per-map figure is the one to act on.
-    affected_maps = {r[0] for r in rows if r[1] != "detector"}
+    affected_maps = {r[0] for r in rows if r[1] != "detector" and r[8] == "no"}
     summary = [
         f"maps with item-keyed gates: {gated_maps}",
         f"  of those, maps with at least one unexplained player-facing gate: "
@@ -425,22 +437,35 @@ def item_gates(mapset, arches, radius=6, **_):
         f"{player_unexplained} ({_pct(player_unexplained, player_facing):.0f}%)",
         f"detectors keyed on slaying: {by_arch['detector']} "
         f"(mostly machinery - counted separately, not in the figures above)",
-        f"invisible trigger altars: {invisible_altars} across {len(invisible_maps)} maps",
+        "gates the player cannot see, by gate type:",
     ]
+    for arch in ("altar_trigger", "check_inv", "detector"):
+        if invisible_by_arch[arch]:
+            summary.append(
+                f"  {arch}: {invisible_by_arch[arch]} across "
+                f"{len(invisible_maps_by_arch[arch])} maps"
+            )
 
-    rows.sort(key=lambda r: (r[8] != "nowhere", r[0]))
+    rows.sort(key=lambda r: (r[8] == "yes", r[9] != "nowhere on this map", r[0]))
     return Report(
         "item-gates",
         "Gates keyed on an item, and whether anything in the map names it",
-        ("map", "gate", "requires", "x", "y", "invisible", "teaching_objects",
-         "nearest_teacher", "requirement_named"),
+        ("map", "gate", "requires", "x", "y", "gate_visibility",
+         "teaching_objects", "nearest_teacher", "explained", "requirement_named"),
         rows,
         summary,
         [
             "This is the check nobody had run: not 'is there a sign' but "
             "'does the text name the thing the gate wants'.",
-            "Matching is on the archetype name, its underscore-free form, and "
-            "its display name, so a sign saying 'roses' will miss 'rose_white'.",
+            "Every gate is a row, explained or not; filter on explained=no for "
+            "the work queue. Each figure above is reproducible from the CSV.",
+            "gate_visibility describes THIS gate object, whatever its type - so "
+            "filtering it alone mixes altars with detector machinery. Filter on "
+            "gate and gate_visibility together to match the per-type counts.",
+            "Matching is literal, on the archetype name, its underscore-free "
+            "form, and its display name. A mouth reading 'drop the letter from "
+            "the dwarf captives here' does not match a gate keyed on 'letter "
+            "from dwarf captives', so explained=no includes false positives.",
             "Guild crafting furniture (Stove, Forge, Cauldron) is keyed the "
             "same way and is explained by joining the guild, not by a sign.",
         ],
