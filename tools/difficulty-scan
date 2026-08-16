@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""Static scans over the Crossfire map set.
+
+Walks the map set once, then runs any of the reports behind the figures in
+difficulty-notes.txt. Every report prints its caveats along with its numbers,
+because several of them are only honest with the caveat attached.
+
+    ./difficulty-scan summary
+    ./difficulty-scan dungeon-shape --csv out/
+    ./difficulty-scan entry-distance --rows 40
+"""
+
+import argparse
+import csv
+import os
+import sys
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from cfscan.archetypes import Archetypes, load_exp_table
+from cfscan.mapset import MapSet
+from cfscan.reports import REPORTS
+
+DEFAULT_MAPS = "~/Documents/cf-devel/crossfire-crossfire-maps"
+DEFAULT_ARCH = "~/Documents/cf-devel/crossfire-crossfire-arch"
+DEFAULT_SERVER = "~/Documents/cf-devel/crossfire-crossfire-server"
+
+
+def expand(path):
+    return os.path.abspath(os.path.expanduser(path))
+
+
+def print_report(report, max_rows, show_caveats=True):
+    print()
+    print("=" * 78)
+    print(report.title)
+    print("=" * 78)
+    for line in report.summary:
+        print("  " + line)
+
+    if report.rows:
+        print()
+        shown = report.rows if max_rows == 0 else report.rows[:max_rows]
+        widths = [len(c) for c in report.columns]
+        for row in shown:
+            for i, cell in enumerate(row):
+                widths[i] = max(widths[i], len(str(cell)))
+        widths = [min(w, 46) for w in widths]
+
+        header = "  ".join(c.ljust(w)[:w] for c, w in zip(report.columns, widths))
+        print("  " + header)
+        print("  " + "-" * len(header))
+        for row in shown:
+            print("  " + "  ".join(
+                str(cell).ljust(w)[:w] for cell, w in zip(row, widths)
+            ))
+        if max_rows and len(report.rows) > max_rows:
+            print(f"  ... {len(report.rows) - max_rows} more rows (--rows 0 for all, or --csv)")
+
+    if show_caveats and report.caveats:
+        print()
+        print("  Caveats:")
+        for caveat in report.caveats:
+            print(f"    - {caveat}")
+
+
+def write_csv(report, directory):
+    os.makedirs(directory, exist_ok=True)
+    path = os.path.join(directory, f"{report.key}.csv")
+    with open(path, "w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(report.columns)
+        writer.writerows(report.rows)
+    return path
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Static scans over the Crossfire map set.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="reports: " + ", ".join(sorted(REPORTS)) + ", all, summary",
+    )
+    parser.add_argument("reports", nargs="*", default=["summary"],
+                        help="report names, 'all', or 'summary' (default)")
+    parser.add_argument("--maps", default=os.environ.get("CF_MAPS", DEFAULT_MAPS),
+                        help="path to a crossfire-maps checkout")
+    parser.add_argument("--arch", default=os.environ.get("CF_ARCH", DEFAULT_ARCH),
+                        help="path to a crossfire-arch checkout")
+    parser.add_argument("--server", default=os.environ.get("CF_SERVER", DEFAULT_SERVER),
+                        help="path to a crossfire-server checkout (for exp_table)")
+    parser.add_argument("--rows", type=int, default=15,
+                        help="rows to print per report; 0 for all (default 15)")
+    parser.add_argument("--csv", metavar="DIR",
+                        help="also write full results as CSV into DIR")
+    parser.add_argument("--no-caveats", action="store_true",
+                        help="suppress the caveat block (do not use when quoting figures)")
+    parser.add_argument("--quiet", action="store_true", help="no progress output")
+    args = parser.parse_args()
+
+    maps_root = expand(args.maps)
+    arch_root = expand(args.arch)
+    server_root = expand(args.server)
+
+    if not os.path.isdir(maps_root):
+        parser.error(f"map set not found: {maps_root}\nPass --maps or set CF_MAPS.")
+    if not os.path.isdir(arch_root):
+        parser.error(f"arch tree not found: {arch_root}\nPass --arch or set CF_ARCH.")
+
+    requested = args.reports or ["summary"]
+    if "all" in requested:
+        wanted = list(REPORTS)
+    elif requested == ["summary"]:
+        wanted = list(REPORTS)
+    else:
+        wanted = []
+        for name in requested:
+            if name not in REPORTS:
+                parser.error(f"unknown report '{name}'. Known: "
+                             + ", ".join(sorted(REPORTS)))
+            wanted.append(name)
+    summary_only = requested == ["summary"]
+
+    started = time.time()
+    if not args.quiet:
+        print(f"reading archetypes from {arch_root} ...", file=sys.stderr)
+    arches = Archetypes(arch_root)
+    exp_table = load_exp_table(server_root)
+    if not args.quiet:
+        print(f"  {len(arches.monsters)} monsters "
+              f"({len(arches.peaceful)} peaceful by default), "
+              f"{len(arches.exits)} exit archetypes", file=sys.stderr)
+        if exp_table is None:
+            print("  no exp_table found; skipping the computed-difficulty column",
+                  file=sys.stderr)
+
+        print(f"reading maps from {maps_root} ...", file=sys.stderr)
+
+    def progress(count):
+        if not args.quiet:
+            print(f"  {count} maps", end="\r", file=sys.stderr)
+
+    mapset = MapSet(maps_root).load(arches=arches, progress=progress)
+    if not args.quiet:
+        print(f"  {len(mapset.maps)} maps, {len(mapset.edges)} exit links, "
+              f"{time.time() - started:.1f}s", file=sys.stderr)
+
+    for name in wanted:
+        report = REPORTS[name](mapset, arches, exp_table=exp_table)
+        print_report(report, 0 if summary_only and False else args.rows,
+                     show_caveats=not args.no_caveats and not summary_only)
+        if args.csv:
+            path = write_csv(report, expand(args.csv))
+            print(f"\n  wrote {len(report.rows)} rows to {path}")
+
+    if summary_only:
+        print()
+        print("Run a report by name for its rows and caveats, e.g. "
+              "./difficulty-scan dungeon-shape")
+
+
+if __name__ == "__main__":
+    main()
