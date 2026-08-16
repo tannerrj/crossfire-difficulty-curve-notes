@@ -25,7 +25,7 @@ Sections:
 * **Adrenaline pacing and backward callbacks, expanded** — measuring how close the first monster is to the entrance, map-side pacing devices, and the `parent`/`setwhen` quest machinery that is built and barely used.
 * **Monitoring, expanded** — the global event hooks, SQLite storage, and logging precedent that are already installed, the death and map-enter scripts nobody has written, and the reports they would produce.
 * **What does not apply cleanly** — dynamic difficulty adjustment, enforced sequence, formal QA.
-* **What Crossfire should actually adopt** — a prioritised list, led by the `difficulty` header audit and death-location aggregation.
+* **What Crossfire should actually adopt** — the prioritised list, plus a five-tier roadmap ordered by what unblocks what, from "no C++, no build" through to changes worth prototyping first.
 
 ---
 

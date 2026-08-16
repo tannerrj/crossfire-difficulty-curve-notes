@@ -675,11 +675,67 @@ None of the first three requires touching C++, a build, or a server restart beyo
 
 ===== What Crossfire should actually adopt =====
 
-  - **Audit the ''difficulty'' header against map contents.** Roughly 1,120 of ~1,220 maps in the city regions set ''difficulty'' by hand, with no cross-author consistency, and the field drives treasure generation (the server computes it from monster experience only when it is unset). A report comparing each map's declared difficulty against its actual monster exp/level content, flagging outliers, is the single highest-value change here — and [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half of that job.
-  - **Aggregate death locations.** The server logs player deaths; rolling those up per map and per coordinate gives you the article's evenly-distributed-deaths test with real data instead of opinion. This turns "that dungeon feels unfair" into a heatmap. Everything else on this list gets easier once it exists.
-  - **Signal danger before the door.** Crossfire dungeon entrances are anonymous holes in the ground. The article's "subtle graphical hints" translate to sign objects, entrance-adjacent corpses and wreckage, and map ''msg'' blocks — cheap, purely map-side, no engine work. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable.
+  - **Audit the ''difficulty'' header against map contents.** 3,281 of 3,282 maps declare a value and 58 percent of them declare exactly 1, which suppresses the server's own estimate and pins treasure to the floor. The field also drives shop stock, skill-ident exp, and hiding, so the audit must segment by map type before comparing anything. [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half.
+  - **Aggregate death locations.** Roll deaths up per map and per coordinate and the article's evenly-distributed-deaths test stops being an opinion. Everything else on this list gets easier once it exists.
+  - **Signal danger before the door.** 582 overworld entrances lead to a map containing monsters and 14 percent of them have a sign, magic mouth, or rune within three tiles. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is 500 maps long.
   - **Teach at the point of need, using the modalities that already exist.** Signs, marking runes, magic mouths, books, NPC ''@match'' dialogue, and ''knowledge_marker'' are all in the engine today and underused (map ''msg'' and region ''msg'' only surface on ''mapinfo'' and ''whereami'', so they are flavour rather than teaching). A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
   - **Give each dungeon a teaching room.** If a map's gimmick is spell-reflecting monsters, invisibility, or a timed gate, room one should demonstrate it somewhere survivable. This is a map-authoring convention, not code — worth writing into ''Info/mapguide''.
   - **Keep doing what the recent altar work does.** The last several commits added second altars to temples for multi-player friendliness. That is the article's "player diversity" principle applied without being told to — reducing contention so different player populations can use the same content. The same instinct should extend to chokepoints in quest maps.
 
-The two to start with are the difficulty audit and death-location aggregation, because both are tooling that is already 60% built, and both convert the rest of the list from taste into evidence.
+==== Two corrections to the list above ====
+
+Both were in the first draft of these notes and both turned out to be wrong once the source was read.
+
+**"The server logs player deaths" - it does not.** In ''server/player.cpp:3576'' a string is built saying who died and how, and in the default non-permadeath configuration it is passed nowhere and discarded. There is no death log, no file, no counter. What exists instead is ''EVENT_PLAYER_DEATH'', a global plugin event, which is a better route anyway.
+
+**The difficulty figure was a city-region sample.** Across the whole set it is not "1,120 of 1,220 set it by hand" but 3,281 of 3,282 declaring a value, of which 1,896 declare 1. That is a weaker claim about hand-tuning and a much stronger claim about the field being meaningless.
+
+==== Ordered by what unblocks what ====
+
+Each expansion above ends with its own conventions. This is the sequence across all of them.
+
+**Tier 0 - no C++, no build, no restart beyond a plugin reload.**
+
+  - ''python/events/death/log_death.py'', writing to the SQLite database ''CFSqlDb.py'' already opens. The directory exists and holds one unrelated script. This is the single highest-value item on the page.
+  - ''python/events/mapenter/'' and ''python/events/mapleave/'' with a daily roll-up, for the completion funnel. Neither directory exists.
+  - A cron job polling ''whereabouts'' for per-region occupancy. Needs nothing from the server at all.
+
+**Tier 1 - text and data files.**
+
+  - Rewrite ''lib/def_help'' to point at mechanics first and the command list second. It is currently eight lines about filing bugs.
+  - Convert ''doc/survival-guide.txt'', ''doc/skills.txt'', and ''doc/runes-guide.txt'' into help topics. The text is written; this is editing.
+  - Write the missing topics: item power, spell paths, praying and gods, resistances, curses, literacy, encumbrance, alchemy, weapon improvement.
+  - Add ''knowledge_marker'' to signs and books that already describe a monster, god, or recipe. Three files in the whole map set currently use it.
+
+**Tier 2 - map work, with a queue the scans already produce.**
+
+  - Sign the 500-odd unsigned entrances to monster-bearing maps.
+  - Review the 12 maps carrying invisible item-keyed trigger altars, starting with ''mlab/citydeclouds/cwdcguestofmarquis1''.
+  - Fix the maps that declare ''difficulty 1'' with monsters on them, and the 43 dungeons that are flat at every depth.
+  - Add a vestibule to the maps whose first hostile is within one or two tiles of the entry point.
+  - Put savebeds near the major dungeon clusters, and a cure sign beside each one.
+  - Give each temple whose god grants restoration an NPC or sign that says so. Ten of the eleven gods qualify.
+
+**Tier 3 - small engine changes, each independently useful.**
+
+  - Print what the player lost when they die. The numbers are already computed; only the output is missing.
+  - Put the exp loss on the gravestone, as that code's own comment has claimed for years.
+  - Add two ''find_help_file_in("mischelp", ...)'' calls so topical help resolves. The category exists in ''help topics'' and the lookup ignores it.
+  - ''death_penalty_skills'' and ''death_penalty_min_level'', both defaulting to current behaviour.
+
+**Tier 4 - prototype on a test server before committing.**
+
+  - Soul recovery at the gravestone. Real multiplayer risk, real payoff.
+  - Substitution tokens in help files so ''death.en'' can state this server's actual numbers.
+
+==== Why this order ====
+
+Tier 0 is first because it is the only tier that produces //evidence//, and every argument on this page is currently an argument about taste. Death locations and completion funnels turn "that dungeon feels unfair" into a ranked list. They also validate the static scans: the difficulty audit says a map //should// be hard, the death data says whether it //was//, and those two joined on the map path are worth far more than either alone.
+
+Tier 1 is second because it is the cheapest real improvement available and it is bounded - a finite list of topics, most of them already drafted somewhere in ''doc/''.
+
+Tiers 2 through 4 are ordered by who can do them without waiting for anybody. A map author can start Tier 2 this afternoon without touching the server; Tier 3 needs a build and a review; Tier 4 needs a decision that is not one person's to make.
+
+==== The one-paragraph version ====
+
+Almost nothing here is new work. The teaching objects exist and are unused, the topical help category exists and is empty, the plugin events exist and are unhooked, the quest conditionals exist and are barely used, and the death penalty is already tunable in a config file. Crossfire does not need new systems to fix what this article describes. It needs somebody to write one Python script, fill in a directory, and then use the resulting numbers to argue about maps with evidence instead of memory.
