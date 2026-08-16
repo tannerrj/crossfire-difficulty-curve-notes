@@ -14,7 +14,7 @@
 
 **Don't hide mechanics as puzzle solutions.** Plenty of Crossfire maps require knowing something never taught anywhere in the game to progress. Expanded below.
 
-**Adrenaline pacing and backward callbacks.** Both apply to dungeon layout and to the quest system. A quest chain that revisits an earlier obstacle with the player's new tools is well within what staged ''.quests'' definitions already support.
+**Adrenaline pacing and backward callbacks.** Both apply to dungeon layout and to the quest system. A quest chain that revisits an earlier obstacle with the player's new tools is well within what staged ''.quests'' definitions already support. Expanded below.
 
 **Monitoring.** Death-location tracking and completion drop-off are the article's most actionable ideas and the ones Crossfire has never done systematically.
 
@@ -442,6 +442,87 @@ This one is nearly fine. The required item is physically present, so a thorough 
   - Where the answer lives on another map, put a thread between them.
 
 The audit that would find the remaining cases is not the one already built - it needs proximity and text matching, not just object counts. But it is the same scan, and the 12 maps with invisible item-keyed altars are a short enough list to review by hand this afternoon.
+
+===== Adrenaline pacing and backward callbacks, expanded =====
+
+These get named together in the source article and they are not the same job. **Adrenaline pacing** is intensity over time inside a single run - the rise and fall that makes the peaks feel like peaks. **Backward callbacks** are content that reaches back to something the player already met and re-frames it with what they have since gained. One is map layout, the other is the quest system, and they have different owners in this project.
+
+==== Crossfire opens at full intensity, and it is measurable ====
+
+The claim at the top of these notes - that most dungeons open at full intensity on room one - turns out to be checkable. Taking every non-overworld map with at least one hostile monster and measuring the distance from the map's declared entry point to the nearest one:
+
+  * **1,062 maps** qualify, excluding the world tiles, editor, test, template, and unlinked directories.
+  * The **median distance to the first hostile is 5 tiles**.
+  * 35 percent have one within 3 tiles, 59 percent within 5, 79 percent within 8, and 90 percent within 12.
+  * Median dungeon or town map area is 484 tiles, roughly 22x22, and 45 percent are 20x20 or smaller.
+  * Median monster density is 1.9 per 100 tiles, which is not high - the monsters are not crowded, they are just //immediately// present.
+
+Five tiles is inside the player's view on arrival. There is no vestibule, no approach, no beat where the player reads the room. The map starts and the fight starts.
+
+NOTE: the measurement is Chebyshev distance and knows nothing about walls, so a monster three tiles away behind a wall counts the same as one in the corridor. It also counts a monster as hostile unless its archetype or its map instance sets ''friendly'' or ''unaggressive'', which will still misfile a few caged or scripted NPCs. The numbers are a floor for the effect, not a precise census - but the direction is not in doubt, and the same scan run per region would show which map sets are worst.
+
+==== What pacing looks like in map terms ====
+
+The article's saw shape needs somewhere to dip, and a 20x20 map with monsters five tiles from the door has nowhere. Concrete devices, all map-side:
+
+**The vestibule.** Three to five tiles of nothing between the entrance and the first threat. It costs almost no space and it is the single cheapest change on this list. The player arrives, sees the room, and chooses to advance - which turns the first fight from an ambush into a decision.
+
+**The breather room.** A lit, monster-free room in the middle of the dungeon. No treasure required, no puzzle, nothing to do but stand still and let spell points come back. The absence of threat is the content. NOTE: keep wandering monsters and generators out of it, or it is not a breather.
+
+**Modulated density rather than an even sprinkle.** A median of 1.9 monsters per 100 tiles spread evenly is a flat line. The same monster budget clustered into three pockets with quiet corridors between them is a saw. Same monsters, same exp, different experience.
+
+**Tension without damage.** Darkness, sound, a locked door that rattles, a corridor of gravestones, a boss visible through bars long before the player can reach it. All of these raise intensity without spending hit points, which is exactly what the low part of the saw is for.
+
+**Decompression after the peak.** Do not put the exit one tile past the boss. A short walk back through the now-empty dungeon is where the win registers, and it is also where the player counts their loot instead of their potions.
+
+==== Backward callbacks: what the quest system already supports ====
+
+The ''.quests'' files are better machinery than their usage suggests. A quest definition carries ''title'', ''face'', ''description'', an optional ''comment'' that players never see, ''restart'', and a list of numbered steps, one of which is flagged ''finishes_quest''. Two features matter here:
+
+**''parent''** makes a quest a child of another, so a chain can be modelled as a tree rather than a line.
+
+**''setwhen''** attaches conditions to a step, so it advances automatically when //other// quests reach given states. From ''include/quest.h'' the condition grammar is ''questcode 20'' for an exact step, ''questcode <=20'' for at most, ''questcode 10-20'' for a range, and ''questcode finished''.
+
+That is precisely the mechanism a callback needs: "this step opens because you finished that other thing." The best worked example in the set is ''darcap/darcap/elemental.quests'', where a parent quest waits on four children:
+
+<code>
+step 20
+description
+I have solved the four elemental quests, I can now claim my reward.
+end_description
+setwhen
+darcap/Elemental 10
+darcap/Elemental-Fire 20
+darcap/Elemental-Water 20
+darcap/Elemental-Air 20
+darcap/Elemental-Earth 20
+end_setwhen
+end_step
+</code>
+
+Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**, a median of 5 steps each, with ''scorn/CoffeeGoose'' the longest at 12. But there are only **24 ''setwhen'' blocks and 15 ''parent'' declarations, spread across 4 of the 21 files**. The cross-quest conditional - the one feature that makes a chain a chain rather than a list - is used by well under a tenth of the content.
+
+**The constraint worth knowing before planning around this.** Quest state is advanced from Python, through ''cf_quest_start'' and ''cf_quest_set_player_state''; there is no map object that reads or writes it. So a callback where the //map itself// changes based on quest state needs a script, not just archetypes. Worse, ''python/CFDialog.py'' keeps its own per-player semaphore state that is separate from the quest system, so a lot of existing dialogue-driven progression is invisible to ''.quests'' entirely. Anybody building on this should decide which of the two state systems they are using before writing the first step.
+
+==== Callback patterns worth building ====
+
+**The door you already walked past.** Put a locked or impassable feature early, in plain sight, and open it at a later quest step. The player has already built a memory of the place, so the return costs no explanation. This needs only a ''setwhen'' and something to flip the gate.
+
+**The monster that beat you, met again.** The article's version of this is re-using an obstacle once the player has the tool for it. In Crossfire terms: the fire immune thing in the level 5 dungeon, met again at level 20 in a wing that was sealed the first time. It also completes the teaching started in the earlier map, which ties this to the mechanic surface section - a mechanic taught once and re-tested later reads as a subject rather than a gimmick.
+
+**The NPC who remembers.** ''@match'' dialogue keyed on quest state, so the guard who turned you away at step 10 greets you by name at step 40. Cheap, and it does more for the sense of a persistent world than most map work.
+
+**The quest that reframes the first dungeon.** The strongest version, and the one nothing in the set currently does: a late quest whose steps send the player back through starting-area maps for a reason that was not visible the first time. It costs no new maps, which is the entire appeal.
+
+==== Conventions worth adding to Info/mapguide ====
+
+  - Leave three to five tiles between the entry point and the first hostile. If the map is too small for that, it is too small to open a dungeon.
+  - Every dungeon of more than two levels gets at least one monster-free, generator-free room.
+  - Spend the monster budget in clusters with quiet between them, not spread evenly across the floor.
+  - Do not place the exit adjacent to the final encounter.
+  - When building a chain, use ''parent'' and ''setwhen'' rather than a flat list of steps, and pick one state system - quest steps or dialogue semaphores - and stay in it.
+
+The entry-distance scan is about thirty lines and runs over the whole map set in seconds. Run per region, it produces a ranked list of the maps that open worst, which is a concrete work queue rather than an opinion about pacing.
 
 ===== What does not apply cleanly =====
 
