@@ -238,6 +238,7 @@ def entrance_signage(mapset, arches, radius=3, **_):
     rows = []
     signed = Counter()
     total = 0
+    all_doors = 0
 
     for path, mapfile in mapset.maps.items():
         if not path.startswith("world"):
@@ -246,6 +247,7 @@ def entrance_signage(mapset, arches, radius=3, **_):
             o for o in mapfile.objects
             if (o.arch in TEACHING_ARCHES or o.arch in arches.signs) and o.msg
         ]
+        squares = []
         for obj, target in mapfile.exits:
             destination = mapset.maps.get(target)
             if destination is None or not destination.hostiles(arches):
@@ -257,32 +259,92 @@ def entrance_signage(mapset, arches, radius=3, **_):
             for threshold in (1, 2, 3, 5):
                 if nearest is not None and nearest <= threshold:
                     signed[threshold] += 1
-            if nearest is None or nearest > radius:
-                rows.append((path, obj.x, obj.y, obj.arch, target,
-                             len(destination.hostiles(arches)),
-                             "" if nearest is None else nearest))
+            squares.append((obj, target, nearest, len(destination.hostiles(arches))))
 
-    summary = [f"overworld entrances whose destination holds monsters: {total}"]
+        for door in _cluster_doors(squares):
+            all_doors += 1
+            if door["nearest"] is None or door["nearest"] > radius:
+                rows.append((
+                    path, door["x"], door["y"], door["arch"], door["target"],
+                    door["hostiles"], door["squares"],
+                    "" if door["nearest"] is None else door["nearest"],
+                ))
+
+    summary = [
+        f"overworld entrance squares whose destination holds monsters: {total}",
+        f"  grouped into doors (adjacent squares sharing a destination): {all_doors}",
+    ]
     for threshold in (1, 2, 3, 5):
         summary.append(
-            f"  signed within {threshold} tiles: {signed[threshold]:4} "
+            f"  squares signed within {threshold} tiles: {signed[threshold]:4} "
             f"({_pct(signed[threshold], total):.0f}%)"
         )
-    summary.append(f"unsigned within {radius} tiles: {len(rows)}  <- work queue")
+    summary.append(
+        f"doors with nothing within {radius} tiles: {len(rows)} of {all_doors} "
+        f"({_pct(len(rows), all_doors):.0f}%)  <- work queue"
+    )
 
     rows.sort(key=lambda r: -r[5])
     return Report(
         "entrance-signage",
         "Overworld entrances to monster-bearing maps, and whether anything warns you",
-        ("world_map", "x", "y", "entrance_arch", "destination", "hostiles", "nearest_sign"),
+        ("world_map", "x", "y", "entrance_arch", "destination", "hostiles",
+         "squares", "nearest_sign"),
         rows,
         summary,
         [
             "Counts only signs, mouths and runes carrying text; scenery is excluded.",
             "A sign near an entrance is not proof it says anything useful - "
             "'Dungeon Master's Lounge' counts here.",
+            "Adjacent squares sharing a destination are one door: a five-tile "
+            "building frontage is one signage job, not five. Two doors far "
+            "apart on the same world tile stay separate even to the same map.",
         ],
     )
+
+
+def _cluster_doors(squares):
+    """Collapse adjacent entrance squares that share a destination into one door.
+
+    A building on the world map is several tiles wide and every tile carries its
+    own exit object pointing at the same interior. Counting those as separate
+    entrances inflates the work queue - it is one sign to write, not five.
+    Grouping is by destination first, then by adjacency, so two genuinely
+    separate doors into the same dungeon are still two jobs.
+    """
+    by_target = defaultdict(list)
+    for obj, target, nearest, hostiles in squares:
+        by_target[target].append((obj, nearest, hostiles))
+
+    doors = []
+    for target, members in by_target.items():
+        unassigned = list(members)
+        while unassigned:
+            obj, nearest, hostiles = unassigned.pop()
+            cluster = [(obj, nearest)]
+            changed = True
+            while changed:
+                changed = False
+                for candidate in list(unassigned):
+                    cand_obj, cand_nearest, _ = candidate
+                    if any(chebyshev(cand_obj.x, cand_obj.y, m.x, m.y) <= 1
+                           for m, _ in cluster):
+                        cluster.append((cand_obj, cand_nearest))
+                        unassigned.remove(candidate)
+                        changed = True
+            # Report the door at its top-left square, and treat it as signed if
+            # any of its squares is: one sign covers the whole frontage.
+            found = [n for _, n in cluster if n is not None]
+            doors.append({
+                "x": min(m.x for m, _ in cluster),
+                "y": min(m.y for m, _ in cluster),
+                "arch": cluster[0][0].arch,
+                "target": target,
+                "hostiles": hostiles,
+                "squares": len(cluster),
+                "nearest": min(found) if found else None,
+            })
+    return doors
 
 
 # ---------------------------------------------------------------------------
