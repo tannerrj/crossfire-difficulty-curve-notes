@@ -17,6 +17,7 @@ A working analysis of [Dave Roberts' "Difficulty Curves"](https://www.davetech.c
 Sections:
 
 * **What applies** — the difficulty saw at the map-set level, the untaught mechanic surface, death penalties, hidden mechanics as puzzles, adrenaline pacing, monitoring.
+* **The difficulty saw, expanded** — why the `difficulty` header holds no curve (and is not even a danger label), what shape 136 multi-level dungeons actually trace, and what a saw would look like per dungeon level.
 * **The mechanic surface, expanded** — why "why did that not work?" is a teaching failure rather than a tuning failure, the teaching objects already in the engine, worked map examples, and conventions worth adding to `Info/mapguide`.
 * **Who Crossfire is actually for, expanded** — layering information so depth stays opt-in, comparable games (NetHack, DCSS, Dwarf Fortress, Caves of Qud, EVE Online), where players currently have to go to read about Crossfire, and what it would take to move that reading in-game.
 * **The death penalty, expanded** — what actually happens on death, what a server admin can soften today with no code changes, what map authors can fix, and eight proposed engine changes ordered by cost.

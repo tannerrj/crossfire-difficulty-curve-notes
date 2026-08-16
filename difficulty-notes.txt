@@ -4,7 +4,7 @@
 
 ===== What applies =====
 
-**The "difficulty saw" instead of a curve.** This is the article's core idea and it applies cleanly at the //map-set// level, not the game level. Crossfire has no global curve — it is an open world where a level 3 character can walk out of Scorn and into something that kills them instantly. But every individual dungeon, tower, or quest chain is a small linear experience, and those absolutely should dip when they introduce their gimmick and then rise. Most Crossfire dungeons open at full intensity on room one.
+**The "difficulty saw" instead of a curve.** This is the article's core idea and it applies cleanly at the //map-set// level, not the game level. Crossfire has no global curve — it is an open world where a level 3 character can walk out of Scorn and into something that kills them instantly. But every individual dungeon, tower, or quest chain is a small linear experience, and those absolutely should dip when they introduce their gimmick and then rise. Most Crossfire dungeons open at full intensity on room one. Expanded below.
 
 **The definition of "new mechanic" is where Crossfire is worst hit.** The article counts new enemy types, new abilities, new item rules, and old mechanics used in novel ways. Crossfire's mechanic surface is enormous — skills, praying and god-granted powers, spell paths, resistances and immunities, item power limits, alchemy, marking runes, dragon players, weapon improvement — and the game teaches almost none of it in-game. The de facto teaching modality is the wiki and asking on IRC. That is exactly the failure the article describes. Expanded below.
 
@@ -17,6 +17,70 @@
 **Adrenaline pacing and backward callbacks.** Both apply to dungeon layout and to the quest system. A quest chain that revisits an earlier obstacle with the player's new tools is well within what staged ''.quests'' definitions already support. Expanded below.
 
 **Monitoring.** Death-location tracking and completion drop-off are the article's most actionable ideas and the ones Crossfire has never done systematically. Expanded below.
+
+===== The difficulty saw, expanded =====
+
+==== What the saw actually asks for ====
+
+The shape is not a ramp. Each time the content introduces something new, intensity //drops//, then climbs past where it was before, and the next introduction drops it again. The dips are not mercy and they are not filler - they are the headroom in which the player learns the new thing without dying to the old thing at the same time. A ramp with no dips teaches nothing, because there is never a moment where the only new variable is the new variable.
+
+The bullet above has the scope right: Crossfire has no global curve and should not try to have one. But a five-level dungeon //is// a linear experience, and it is the unit where the saw applies.
+
+==== The difficulty header is not the curve, and is not even a danger label ====
+
+The obvious place to look for an intended shape is the ''difficulty'' header. It does not hold one, for three separate reasons.
+
+**Almost every map declares a value, and most declare the same one.** 3,281 of 3,282 maps set ''difficulty'' explicitly. **1,896 of them - 58 percent - declare exactly 1.** That is not a judgement, it is a default that nobody changed.
+
+**Declaring a value switches the server's own estimate off.** ''calculate_difficulty()'' in ''common/map.cpp'' opens with a short circuit: if the map declares anything non-zero, that value is returned unchanged and no calculation happens. A map full of dragons that says ''difficulty 1'' //is// difficulty 1 as far as the server is concerned. The function's own comment says human calculation is better than its guesswork, which is fair, but 1 is not a human calculation.
+
+**The declared numbers and the calculated ones are not even on the same scale.** The estimator caps at 25. **360 maps - 11 percent - declare above that ceiling**, topping out at ''scorn/misc/testing_area'' with 1000. Whatever authors think the field means, it is not what the function computes.
+
+And the field is load-bearing well beyond danger. Map difficulty feeds treasure quality in chests and containers, shop restocking, the experience awarded for skill identification, and how quickly a hidden player is revealed - ''server/apply.cpp'', ''server/c_misc.cpp:2321'', ''server/skill_util.cpp:718'', and ''server/player.cpp:4082''. That last pair is worth knowing: a map declaring 1 makes hiding easier and skill-ident exp lower, quite apart from what lives there.
+
+NOTE: this is the trap in the difficulty audit proposed at the bottom of this page. ''wolfsburg/shops/transport.shoppe'' declares 110 and contains no monsters at all, which a monster-content audit would flag as a wild outlier. It is a shop, and there the number is setting stock quality. **The audit has to segment by map type before it compares anything**, or it will produce a long list of confident false positives.
+
+==== Measuring the shape ====
+
+Declared difficulty is still the best available record of what an author //intended//, so it is worth asking what shape it traces through a dungeon. Building a map graph from exit objects, grouping by directory, filtering to groups of three or more linked maps where most maps contain monsters - which drops the guild halls, shop rows, and apartment blocks - and walking outward from whichever map is entered from outside the group:
+
+  * **136 monster-bearing multi-map dungeons** qualify, a median of 5 maps each.
+  * **32 percent are flat** - the same declared difficulty at every depth, from the entrance to the bottom.
+  * 68 percent vary with depth. Of those, **51 percent rise strictly**, never dipping once.
+  * The remaining **49 percent of graded dungeons contain a dip somewhere** - but reading them, the dips mostly land at the //end//, not after an introduction: ''euthville'' runs 15, 15, 15, 15, 15, 15, 18, 13, and ''darcap/castle'' runs 12, 1, 1, 1. That is the last level being softer than the one before it, which is inconsistency rather than pacing.
+
+So the honest summary is not "Crossfire has the wrong shape." It is that **a third of dungeons are a flat line, half the rest are a pure ramp, and the dips that do exist are not placed where a saw would put them.** Nothing in the map set reads as an author deliberately dropping intensity to make room for a new idea.
+
+The exceptions are worth naming, because they show it is achievable within the existing format. ''navar_city/mlab'' grades 47 linked maps across 15 distinct values from 1 to 90. ''quests/peterm/FireTemple'' runs 14 maps across 10 values from 8 to 60. ''brest/asyvan'', ''pup_land/s_f'', and ''sisters'' are all in the same territory.
+
+NOTE: three caveats on all of the above. This measures **declared** difficulty, which is author intent and not what a player feels - the death data from the monitoring section is what would measure the second. Using a directory as the boundary of a dungeon is a proxy that will merge some things and split others. And depth is breadth-first distance from whichever map is entered from outside, which is wrong for any dungeon with two entrances.
+
+==== What a saw would look like here ====
+
+The unit is the dungeon level, and the mechanism is monster budget rather than the header. Concretely, for a dungeon whose gimmick is spell-reflecting monsters:
+
+  * **Level 1** opens under the pressure of the previous peak - which for a fresh dungeon means low - and introduces the reflectors in isolation. This is the teaching room from the mechanic surface section, and it is also the first dip.
+  * **Level 2** rises: reflectors plus ordinary monsters, at a level where the player has to sequence their attacks.
+  * **Level 3** dips again to introduce the //next// idea - say, a monster that dispels - with the reflectors absent or thinned out.
+  * **Level 4** combines both and exceeds level 2.
+
+The dips are cheap. They cost monster budget, not map count, and the budget freed on the dip levels pays for the peaks. This is the same argument as the pacing section, one scale up: there it was rooms within a map, here it is maps within a dungeon.
+
+The ''difficulty'' header should then be written to follow that shape rather than left at 1 - not because the number changes the monsters, but because it changes the treasure, and because an author who cannot write down the intended sequence probably does not have one.
+
+==== Conventions worth adding to Info/mapguide ====
+
+  - A multi-level dungeon should be able to state its intended difficulty sequence in one line. If that line is flat, the dungeon has no shape.
+  - Never ship ''difficulty 1'' on a map with monsters. It is the default, it suppresses the server's own estimate, and it sets treasure to the floor.
+  - Put the dip where something new is introduced, and pay for it out of monster budget rather than map count.
+  - Do not soften the last level. Several dungeons currently end easier than they peaked, which reads as running out of steam.
+  - Where the field is being used for shop stock or another economy purpose rather than danger, say so in the map's ''comment'' so an audit can skip it.
+
+==== Making it measurable ====
+
+The graph scan behind the numbers above is small - resolve exit ''slaying'' paths, group by directory, walk outward from the entrance - and it produces a per-dungeon difficulty sequence that an author can read at a glance. Run against the whole set it gives three work queues: the flat dungeons, the maps declaring 1 with monsters on them, and the dungeons that end softer than they peaked.
+
+Joined against the death data from the monitoring section, it answers the question this whole page keeps circling: does declared difficulty have anything to do with where players actually die?
 
 ===== The mechanic surface, expanded =====
 
