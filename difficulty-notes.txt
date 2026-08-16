@@ -500,9 +500,9 @@ The obvious measurement is "gated maps containing no sign, book, rune, mouth, or
 
 A useful audit has to check three things, not one: that a teaching object exists, that it is **near** the gate, and that its text actually **names the requirement**. The third is the only one that matters and the only one nobody had scanned for.
 
-''tools/difficulty-scan item-gates'' now does. Matching each gate's ''slaying'' string against the text of every readable within six tiles — on the archetype name, its underscore-free form, and its display name — **318 of the 464 gated maps, 69 percent, carry at least one player-facing gate that nothing in the map explains.** It also reports ''detector'' separately from ''altar_trigger'' and ''check_inv'', because detectors fire on spell effects and markers and are mostly machinery rather than puzzles; folding them in makes the map set look far worse than it is.
+''tools/difficulty-scan item-gates'' now does. Matching each gate's ''slaying'' string against the text of every readable within six tiles — every content word of the requirement has to appear, in any order, allowing plurals — **314 of the 464 gated maps, 68 percent, carry at least one player-facing gate that nothing in the map explains.** It also reports ''detector'' separately from ''altar_trigger'' and ''check_inv'', because detectors fire on spell effects and markers and are mostly machinery rather than puzzles; folding them in makes the map set look far worse than it is.
 
-NOTE: the match is literal, so a sign saying "bring roses" will not match a gate keyed on ''rose_white''. The 69 percent is an upper bound, and the rows are worth reading before anyone acts on the number.
+NOTE: the obvious worry about a scan like this is how many maps it accuses unfairly, so it is worth measuring rather than hedging about. Matching on the exact phrase instead flags 317 maps; the word-based rule flags 314. The four that move are ''dungeons/dark-cave/dark-cave-2'', whose magic mouth sits //on the altar square// reading "Drop the letter from the dwarf captives here"; ''scorn/houses/house3.1st'', whose guildmaster says "bring me the head of an angry pixie"; ''pup_land/kurte/house'', which wants "scholars of Kurte"; and one coincidence. **The false-positive rate on this axis is about one percent**, so the 68 percent is close to real rather than a loose upper bound.
 
 ==== The bad case ====
 
@@ -564,7 +564,7 @@ This one is nearly fine. The required item is physically present, so a thorough 
   - Scenery does not count. A ''bookshelf'' is furniture; only a readable with a ''msg'' teaches anything.
   - Where the answer lives on another map, put a thread between them.
 
-The audit that finds these is ''tools/difficulty-scan item-gates'', which does the proximity and text matching rather than counting objects. Its 318-map queue is too long to clear in one sitting, but the 12 maps carrying invisible item-keyed altars are a short enough list to review by hand this afternoon.
+The audit that finds these is ''tools/difficulty-scan item-gates'', which does the proximity and text matching rather than counting objects. Its 314-map queue is too long to clear in one sitting, but the 12 maps carrying invisible item-keyed altars are a short enough list to review by hand this afternoon — and four of those twelve are one author's mechanism in ''mlab/citydeclouds'', replicated across four maps with the same 16-item demand list and carrying 315 of the 389 invisible altars between them. Two of the four have no readable text anywhere on the map at all.
 
 ===== Adrenaline pacing and backward callbacks, expanded =====
 
