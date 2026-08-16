@@ -22,6 +22,7 @@ Sections:
 * **The death penalty, expanded** — what actually happens on death, what a server admin can soften today with no code changes, what map authors can fix, and eight proposed engine changes ordered by cost.
 * **Hidden mechanics as puzzle solutions, expanded** — the puzzle-versus-lockout test, how many item-keyed gates the map set actually has, why the naive audit undercounts, and worked bad/good/middle cases.
 * **Adrenaline pacing and backward callbacks, expanded** — measuring how close the first monster is to the entrance, map-side pacing devices, and the `parent`/`setwhen` quest machinery that is built and barely used.
+* **Monitoring, expanded** — the global event hooks, SQLite storage, and logging precedent that are already installed, the death and map-enter scripts nobody has written, and the reports they would produce.
 * **What does not apply cleanly** — dynamic difficulty adjustment, enforced sequence, formal QA.
 * **What Crossfire should actually adopt** — a prioritised list, led by the `difficulty` header audit and death-location aggregation.
 

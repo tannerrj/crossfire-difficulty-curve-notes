@@ -16,7 +16,7 @@
 
 **Adrenaline pacing and backward callbacks.** Both apply to dungeon layout and to the quest system. A quest chain that revisits an earlier obstacle with the player's new tools is well within what staged ''.quests'' definitions already support. Expanded below.
 
-**Monitoring.** Death-location tracking and completion drop-off are the article's most actionable ideas and the ones Crossfire has never done systematically.
+**Monitoring.** Death-location tracking and completion drop-off are the article's most actionable ideas and the ones Crossfire has never done systematically. Expanded below.
 
 ===== The mechanic surface, expanded =====
 
@@ -306,9 +306,9 @@ This is the highest value-to-effort item on the list. Most of the perceived crue
 
 === Log deaths in a machine-readable form ===
 
-The enabling change for the death-location aggregation further down this page, and it belongs here because ''kill_player()'' is where the data is.
+The enabling change for the death-location aggregation further down this page. It is listed here because ''kill_player()'' is where the data is, but it belongs in this section only as a fallback - **this needs no C++ at all**, and the monitoring section below explains why. ''EVENT_PLAYER_DEATH'' already fires from ''kill_player()'' before the player is moved to their savebed, so a Python global event script sees the death location directly.
 
-**Change:** one log line per death with map path, x, y, player level, killer name, and exp lost - either a dedicated file or a plugin hook, perhaps 20 lines. **Risk:** disk growth and privacy on a public server; log rotation and player-name hashing handle both.
+**Change:** one record per death with map path, x, y, player level, killer name, and exp lost. Do it as a plugin script first; only touch the C++ if the exp figure turns out to be unreachable from Python. **Risk:** disk growth and privacy on a public server; log rotation and player-name hashing handle both.
 
 Everything the monitoring section wants falls out of this, and it makes every other proposal here testable instead of arguable.
 
@@ -523,6 +523,83 @@ Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**
   - When building a chain, use ''parent'' and ''setwhen'' rather than a flat list of steps, and pick one state system - quest steps or dialogue semaphores - and stay in it.
 
 The entry-distance scan is about thirty lines and runs over the whole map set in seconds. Run per region, it produces a ranked list of the maps that open worst, which is a concrete work queue rather than an opinion about pacing.
+
+===== Monitoring, expanded =====
+
+This is the cheapest section on the page, and that is the surprise. Every other expansion here proposes writing something. This one is mostly a matter of using machinery that is already installed, already dispatching, and already has working examples in the map set.
+
+==== The harness is already installed ====
+
+The server exposes **19 global plugin events**. From ''include/events.h'' and the dispatch table in ''plugins/cfpython/cfpython.cpp'', the ones that matter for measurement are ''born'', ''death'', ''gkill'', ''login'', ''logout'', ''mapenter'', ''mapleave'', ''mapreset'', ''mapload'', ''mapready'', ''mapunload'', ''remove'', ''gbought'', ''gsold'', and ''clock''.
+
+Dispatch is by directory convention. The Python plugin looks in ''python/events/<eventname>/'' and runs every script it finds there - ''cfpython.cpp:1638''. No registration, no build step; drop in a ''.py'' file and it runs.
+
+Storage is solved too. ''python/CFSqlDb.py'' is eight lines that hand back a ''sqlite3'' connection to ''crossfire.db'' in the server's local directory. There is already a SQLite database sitting there.
+
+And the pattern is established. ''python/CFLog.py'' plus the scripts in ''python/events/'' already log births, logins, kicks, muzzles, and character removals to flat records.
+
+So: hooks, dispatch, storage, and precedent. Of the 19 event directories the plugin will look for, the map set uses 9. The ones nobody has created are ''mapenter'', ''mapleave'', ''mapreset'', ''logout'', and ''clock'' - which is very nearly an exact list of the article's monitoring asks.
+
+==== Death locations: the script that does not exist ====
+
+''python/events/death/'' exists. It contains ''autojail.py'' and nothing else. Nobody has ever written ''log_death.py''.
+
+Two details make this work better than expected:
+
+**The event fires before the player is moved.** ''events_execute_global_event(EVENT_PLAYER_DEATH, op, killer)'' is at ''server/player.cpp:3575'', and ''enter_player_savebed()'' is not reached until deep inside ''kill_player_not_permadeath()''. The script sees the player standing on the square where they actually died, with their map, coordinates, level, and killer all intact.
+
+**Arena deaths are already excluded.** ''op_on_battleground()'' returns at ''player.cpp:3569'', before the event fires, so deaths in combat arenas never enter the stream. That is free data hygiene - nobody has to filter out the teamarena maps.
+
+The record to write is small: timestamp, map path, x, y, player level, killer name, and a hashed player identifier. That is one script, one table, and it is the single highest-value thing on this entire page, because it converts every other argument here from taste into evidence.
+
+==== Completion drop-off ====
+
+''mapenter'' and ''mapleave'' are registered global events with no directory at all, which means nobody has ever measured how far into anything a player gets.
+
+Paired enter and leave records give the whole funnel: how many players entered a dungeon's first level, how many reached the second, how many reached the last, how long they stayed on each, and - the useful one - which level they were standing on when they left and did not come back. That is the article's completion drop-off, and it needs the same amount of work as the death script.
+
+NOTE: the noise is real and has to be handled up front. Reset cycles, relogs, players passing through a map on the way somewhere else, and DMs teleporting around will all generate events. Recording the player level and the session identifier alongside each event lets most of that be filtered later rather than never.
+
+==== What else is sitting there unused ====
+
+**Live region occupancy.** ''whereabouts'' walks every region and reports how many players are in each - ''server/c_misc.cpp:495''. It is computed fresh each time and thrown away. Polling it on a schedule and appending the result gives a region popularity history with no server change whatsoever, which answers "which parts of the world does anybody actually visit" - a question nobody currently has data for.
+
+**Session length.** ''login'' is logged, ''logout'' is not, so how long people play is unknown.
+
+**Kill data.** ''gkill'' fires for everything killed by anyone, and ''python/events/gkill/'' already contains ''reputation.py'' and ''sword_of_souls.py''. The hook is proven; nothing aggregates from it.
+
+**Economy.** ''gbought'' and ''gsold'' both have working scripts already. Shop flow is measurable today.
+
+**Retention.** ''born'' and ''remove'' are both logged already. Nobody has ever joined them up to ask how many characters created in a given month were still being played a month later - which is the empirical version of the "who is this game for" question.
+
+==== The reports this produces ====
+
+  - **Death heatmap per map and coordinate** - the article's evenly-distributed-deaths test, with real data.
+  - **Entry-to-completion funnel per dungeon** - which maps people start and do not finish.
+  - **Declared ''difficulty'' against observed deaths** - this closes the loop with the difficulty audit at the bottom of this page. A map declaring difficulty 5 that kills level 20 characters is mislabelled, and no static scan of monster exp can tell you that.
+  - **First-hostile distance against death rate** - directly tests the pacing claim measured earlier. If the maps that open at one tile are also the maps people abandon, that argument is settled.
+  - **New character retention** - born, login count, and remove, joined.
+
+The third one is worth dwelling on. The difficulty audit compares a map's declared difficulty against its monster content, which is a static proxy for how hard it is. Death data measures how hard it //actually was//, for real players, at the levels they really were. Those two reports together are a far stronger tool than either alone, and they share a key: the map path.
+
+==== Privacy and operations ====
+
+This is a public server logging player behaviour, so the boring parts matter and should be settled before the first script ships.
+
+  * Hash player names on write. None of these reports need to identify individuals, and a per-server salt keeps the records joinable without being personal.
+  * Set a retention window and rotate. Aggregates are worth keeping indefinitely; raw event rows are not.
+  * Decide the publication policy in advance. "Map X killed 400 people this month" is fine; anything that singles out a named player is not.
+  * Size it honestly. Death events are rare and cheap. ''mapenter'' fires constantly and will need either sampling or a periodic roll-up into daily counts.
+
+==== What to build first ====
+
+  - ''python/events/death/log_death.py'' writing to the existing SQLite database. One script, no engine change, and every other item here depends on it.
+  - ''python/events/mapenter/'' and ''python/events/mapleave/'' with a roll-up, for the completion funnel.
+  - A cron job polling ''whereabouts'' for region occupancy, which needs nothing at all from the server.
+  - A report joining death counts per map against that map's declared ''difficulty'' header.
+  - ''logout'' logging, to close the session-length gap.
+
+None of the first three requires touching C++, a build, or a server restart beyond reloading the plugin. Given that the article calls monitoring its most actionable idea and Crossfire has never done it, the gap between here and there is one Python script and an afternoon.
 
 ===== What does not apply cleanly =====
 
