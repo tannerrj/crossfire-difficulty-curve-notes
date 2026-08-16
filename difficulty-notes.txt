@@ -12,7 +12,7 @@
 
 **Don't punish failure with increased difficulty.** Crossfire's death penalty is exp loss plus stat depletion — the player who just failed is now measurably weaker facing the same content. This is the article's explicit "don't." It reads like an engine problem, but most of it is not - the numbers are already tunable in ''lib/config/settings'', and the depletion is curable by any player who knows how. Expanded below.
 
-**Don't hide mechanics as puzzle solutions.** Plenty of Crossfire maps require knowing something never taught anywhere in the game to progress.
+**Don't hide mechanics as puzzle solutions.** Plenty of Crossfire maps require knowing something never taught anywhere in the game to progress. Expanded below.
 
 **Adrenaline pacing and backward callbacks.** Both apply to dungeon layout and to the quest system. A quest chain that revisits an earlier obstacle with the player's new tools is well within what staged ''.quests'' definitions already support.
 
@@ -351,6 +351,97 @@ This converts the penalty from a tax into content. The player who died gets a re
 Every number in the configuration section is a knob somebody can turn on opinion. The death log is 20 lines and it is what turns this into evidence - same conclusion as everywhere else on this page.
 
 And watch the multiplayer angle. Any change here interacts with the shared economy: soul recovery is tradeable if you are careless, depletion decay devalues potions of life, and a lighter penalty changes the risk calculus for high-level players farming low-level content. None of these is a blocker, but each needs the party and economy case thought through before it ships.
+
+===== Hidden mechanics as puzzle solutions, expanded =====
+
+==== Puzzle or lockout ====
+
+There is a clean test for this and it is worth stating before the examples. A **puzzle** asks the player to combine things the game has shown them. A **lockout** asks them to already know something the game never showed them anywhere. Both feel identical from the author's chair, because the author knows the answer. They are completely different from the player's side: one is solvable by thinking harder, the other is solvable only by alt-tabbing.
+
+The test is a single question - //where in the game could a player have learned this?// If the honest answer is "another map, and nothing points there" or "the wiki" or "you would have to try it", it is a lockout. Note that the answer does not have to be on the same map. A rumour in a tavern three towns over is a legitimate answer, as long as something connects the two.
+
+==== How much of this is there ====
+
+The gating mechanisms are ''check_inv'', ''altar_trigger'', and ''detector'', all keyed on a ''slaying'' string naming the required item. Across the map set, excluding editor, test, template, and unlinked directories:
+
+  * **464 maps** contain at least one item-keyed gate.
+  * **5,689 item-keyed trigger altars** across **225 maps** - the "put the right thing on the right square" mechanism.
+  * **453 maps** contain a ''pedestal'', the same idea driven by weight rather than by item identity.
+  * **389 of those trigger altars are ''invisible 1''**, across **12 maps**. The mechanism itself cannot be seen.
+
+NOTE: the counts are the easy part. The hard part is that a scan can tell you a gate exists and cannot tell you whether the map explains it, which is the next section.
+
+==== Why the naive audit does not work ====
+
+The obvious measurement is "gated maps containing no sign, book, rune, mouth, or NPC dialogue," and it comes out at about 16 percent of gated maps. That number is too flattering, and the reasons are instructive for anybody building the tooling:
+
+  * ''bookshelf'' matches a search for books and carries no text at all. Two of them sit in the worst example below and made it score as a map with teaching objects.
+  * ''scorn/temples/gorokh_final'' contains a sign. It reads "Dungeon Master's Lounge."
+  * Guild maps are full of gates keyed on ''Stove'', ''Forge'', ''Cauldron'', and ''TanningDesk'' - crafting furniture, explained by the act of joining a guild, not really puzzles at all.
+
+A useful audit has to check three things, not one: that a teaching object exists, that it is **near** the gate, and that its text actually **names the requirement**. The third is the only one that matters and the only one nobody has scanned for.
+
+==== The bad case ====
+
+''mlab/citydeclouds/cwdcguestofmarquis1'' - "Guest of the Marquis", 64x63, ''difficulty 45''.
+
+Five unremarkable squares near the middle of the map carry **45 stacked trigger altars**, every one of them ''invisible 1'', each named after a creature and keyed to a different item:
+
+<code>
+arch altar_trigger
+name balrog
+slaying demon_head
+food 1
+x 47
+y 26
+invisible 1
+connected 66685
+end
+</code>
+
+The full demand list across those five squares runs to gold nuggets, sulphur, ruby, bat wing, four different colours of rose, a demon's head, mint, salt, an apple, a mace, and a rock. The map contains no sign, no ''magic_mouth'', no ''rune_mark'', no NPC ''@match'' dialogue, and no readable book - the only two book-shaped objects are scenery bookshelves with no message. Nothing anywhere on the map indicates that those squares are different from any other square, let alone which of a dozen items each one wants.
+
+This is the article's "don't" in its purest available form. The mechanism is invisible, the requirement is unguessable, and there is no in-game path to the answer. A player either has the wiki open or they do not finish the map.
+
+==== The good case ====
+
+''wolfsburg/shops/transport.shoppe'' uses **the same hidden mechanism** - 11 invisible item-keyed altars taking payment - and is completely legible, because it also carries a numbered sign, two magic mouths, and NPC dialogue:
+
+<code>
+Information on using our teleporters
+------------------------------
+1. Supply the proper payment.
+2. Step forward *quickly*.
+3. Apply the teleporter or wait a moment for the teleporter to activate.
+</code>
+
+Same engine feature, opposite outcome. This is the whole argument in two maps: invisible altars are not the problem, unexplained invisible altars are. Nothing about the mechanism needed to change.
+
+==== The middle case ====
+
+''scorn/temples/gorokh_final'' has an altar keyed to ''apple'', and an apple placed somewhere on the map. Four magic mouths deliver atmosphere - "Only the Advocate may enter", "Gorokh has noticed you" - and not one of them mentions the apple or the altar.
+
+This one is nearly fine. The required item is physically present, so a thorough player can solve it by experiment, which makes it a puzzle rather than a lockout. But the map already has four mouths, and one more sentence in any of them would turn "I wandered around picking things up" into "I worked out what the temple wanted." The cost of the fix is a line of text in a file that already exists.
+
+==== The common shapes and what to do about each ====
+
+**The unmarked trigger square.** Invisible ''altar_trigger'' or ''pedestal'' with no visual difference from its neighbours. Fix: make it visible, or leave it invisible and mark the floor around it - a rune, a mosaic, scorch marks, a body slumped against the wall holding the right item. The mechanism can stay hidden as long as the //location// is not.
+
+**The unguessable ingredient.** A gate keyed to a specific item with nothing naming it. Fix: name it somewhere reachable. A previous petitioner's journal, an NPC who complains about the price of roses, a mouth that says what the last person tried and how it went. Attach ''knowledge_marker'' so the answer survives the session.
+
+**The off-map answer.** The solution is written down, in a different map, with nothing connecting them. This is the most defensible of the four and still needs a thread - a rumour, a torn page, an NPC who names the town.
+
+**The untaught engine mechanic.** The puzzle needs marking runes, pushing objects, a specific spell, or the ''search'' skill, and the game never taught any of them. Fix: this is not a puzzle problem, it is the mechanic surface problem. Teach the mechanic somewhere survivable first, then a puzzle built on it is fair.
+
+==== Conventions worth adding to Info/mapguide ====
+
+  - Every gate keyed on ''slaying'' needs an in-game answer somewhere, and the author should be able to name the map and object that provides it.
+  - If the trigger is ''invisible 1'', something visible must mark the square. Hide the mechanism, not the location.
+  - Atmosphere text is not teaching text. A map can have five magic mouths and still tell the player nothing, and ''gorokh_final'' is the proof.
+  - Scenery does not count. A ''bookshelf'' is furniture; only a readable with a ''msg'' teaches anything.
+  - Where the answer lives on another map, put a thread between them.
+
+The audit that would find the remaining cases is not the one already built - it needs proximity and text matching, not just object counts. But it is the same scan, and the 12 maps with invisible item-keyed altars are a short enough list to review by hand this afternoon.
 
 ===== What does not apply cleanly =====
 

@@ -20,6 +20,7 @@ Sections:
 * **The mechanic surface, expanded** — why "why did that not work?" is a teaching failure rather than a tuning failure, the teaching objects already in the engine, worked map examples, and conventions worth adding to `Info/mapguide`.
 * **Who Crossfire is actually for, expanded** — layering information so depth stays opt-in, comparable games (NetHack, DCSS, Dwarf Fortress, Caves of Qud, EVE Online), where players currently have to go to read about Crossfire, and what it would take to move that reading in-game.
 * **The death penalty, expanded** — what actually happens on death, what a server admin can soften today with no code changes, what map authors can fix, and eight proposed engine changes ordered by cost.
+* **Hidden mechanics as puzzle solutions, expanded** — the puzzle-versus-lockout test, how many item-keyed gates the map set actually has, why the naive audit undercounts, and worked bad/good/middle cases.
 * **What does not apply cleanly** — dynamic difficulty adjustment, enforced sequence, formal QA.
 * **What Crossfire should actually adopt** — a prioritised list, led by the `difficulty` header audit and death-location aggregation.
 
