@@ -10,7 +10,7 @@
 
 **"It is impossible to make a game for everyone."** Crossfire has implicitly targeted one archetype for 30 years: the player who reads external documentation and enjoys opaque systems. That is a legitimate choice, but it should be a //decision//, not an accident, and it should be stated so map authors design toward it consistently. Expanded below.
 
-**Don't punish failure with increased difficulty.** Crossfire's death penalty is exp loss plus stat depletion — the player who just failed is now measurably weaker facing the same content. This is the article's explicit "don't," and it is baked into the engine rather than the maps, so it is a server-side conversation, not a map one.
+**Don't punish failure with increased difficulty.** Crossfire's death penalty is exp loss plus stat depletion — the player who just failed is now measurably weaker facing the same content. This is the article's explicit "don't." It reads like an engine problem, but most of it is not - the numbers are already tunable in ''lib/config/settings'', and the depletion is curable by any player who knows how. Expanded below.
 
 **Don't hide mechanics as puzzle solutions.** Plenty of Crossfire maps require knowing something never taught anywhere in the game to progress.
 
@@ -46,7 +46,7 @@ These are not specific to any one dungeon, so teaching them in every dungeon is 
 
 ==== 3. Engine-side - not a map author's problem ====
 
-The death penalty, the wording of refusal messages, and the general absence of a "that did nothing, and here is why" feedback line. Worth listing separately so nobody tries to paper over them with signs.
+The wording of refusal messages and the general absence of a "that did nothing, and here is why" feedback line. Worth listing separately so nobody tries to paper over them with signs. The death penalty looks like it belongs here too, but most of it does not - see the death penalty section below.
 
 ==== What the engine already hands a map author ====
 
@@ -206,7 +206,7 @@ The gap is smaller than it looks, because most of the machinery is already built
 
 **And it is not wired up anyway.** ''find_help_file()'' searches ''wizhelp'' and ''help'' only. Drop a file into ''mischelp'' today and it would be //listed// under "Misc help" and still be unreadable, because ''help <topic>'' would not find it. Two more ''find_help_file_in()'' calls fixes that. It is the smallest engine change on this list and it unblocks all of the rest.
 
-**All 96 help topics are commands.** Everything in ''lib/help'' documents the interface: ''apply'', ''bind'', ''pickup'', ''shoottype''. Not one documents the world. There is no ''itempower'', no ''paths'', no ''praying'', no ''resistances'', no ''curse'', no ''literacy'', no ''encumbrance'', no ''alchemy''. A player can learn every keystroke in the game and still not be told that armour weight costs them spell point regeneration.
+**Of 96 help topics, all but about three document the interface.** Most of ''lib/help'' covers keystrokes and syntax: ''apply'', ''bind'', ''pickup'', ''shoottype''. The exceptions are ''death.en'' and ''spells.en'', with ''traps.en'' a partial third, and ''death.en'' in particular is well written - which proves the project can produce this material when somebody sits down to do it. There is still no ''itempower'', no ''paths'', no ''praying'', no ''resistances'', no ''curse'', no ''literacy'', no ''encumbrance'', and no ''alchemy''. A player can learn every keystroke in the game and still not be told that armour weight costs them spell point regeneration. The problem is not that nobody can write these; it is that two got written and the effort stopped.
 
 **The starting help page is eight lines.** ''lib/def_help'' explains how to use ''help'' and how to file a bug. That is the game's front door for a new player, and it points at a topic list that is entirely commands.
 
@@ -224,6 +224,133 @@ Ordered by cost, the work looks like this:
   - Give new characters one readable in-game item that says the ''help'' and ''knowledge'' commands exist.
 
 None of that removes a single system, changes a single monster, or makes the game easier. It changes the game from one that requires a second screen into one that merely rewards it, and the archetype in line one is still the player it is built for.
+
+===== The death penalty, expanded =====
+
+==== What actually happens when you die ====
+
+The one-line summary above - exp loss plus stat depletion - is right but incomplete, and the incomplete part is where the fixes live. From ''kill_player_not_permadeath()'' in ''server/player.cpp:3599'', in order:
+
+  - One random stat of seven is depleted. With the default ''stat_loss_on_death false'' this is a recoverable ''depletion'' object in your inventory, not permanent stat loss.
+  - A gravestone is placed on the square where you died, naming you, your title, and your killer.
+  - ''restore_player()'' clears poison, disease, and confusion.
+  - ''apply_death_exp_penalty()'' runs, per skill and again on total exp.
+  - Food is topped up to 900 if it was under 100, and hp, sp, and grace are refilled.
+  - Unpaid shop items are stripped.
+  - You are teleported to your last savebed, unbraced, with pickup inhibited, and saved.
+  - If a spell effect is sitting on your savebed square, you get a 50-tick immunity force so you cannot be spawn-killed.
+
+Two things stand out. **No items are lost** - your gear comes with you, which is already more merciful than most of the genre. And death partially //heals// you: full hp, sp, grace, food, and every status effect cleared. The engine is not as punitive as its reputation, and saying so makes the criticism of what remains more credible rather than less.
+
+The exp penalty itself, from ''apply_death_exp_penalty()'' in ''common/living.cpp:2244'', is the lesser of three numbers, computed **per skill**: ''death_penalty_percentage'' of that skill's exp, the exp equivalent of ''death_penalty_levels'' levels, or half of your non-permanent exp. Defaults in ''lib/config/settings'' are 20 percent, 3 levels, and ''permanent_experience_percentage 50''. So on a default server you cannot lose more than a quarter of your total exp no matter how badly things go, and half of it can never be lost at all.
+
+The per-skill part is the ugly bit. Every skill in your inventory takes the hit, including the ten you were not using when you died. A character who dies while meleeing loses literacy exp, bargaining exp, and praying exp along with it.
+
+**The depletion is curable and most players do not know how.** ''remove_depletion()'' is reachable three ways: a potion of life, the restoration spell, or praying at your god's altar. Ten of the game's eleven gods grant ''god_remove_depletion'' at ''chance 50'' with no level gate - Gnarg, Lythander, Mostrai, Valkyrie, Gaea, Ixalovh, Ruggilli, Sorig, Gorokh, and Valriel. The only holdout is Devourers, which is at least thematically honest. Praying at your own altar long enough is free and fixes everything.
+
+That reframes the section. The death penalty is not really a difficulty penalty. It is a penalty for not having read the wiki - a player who knows about praying pays nothing but time, and a player who does not stays weakened indefinitely and concludes the game is punishing them. Recoverable depletion that the player cannot discover how to cure is functionally identical to permanent stat loss: same outcome, worse feeling, and fixable with a sign. It is the mechanic surface problem wearing a different hat.
+
+It also helps to separate three things that get discussed as one. At death the numbers go down, you are weakened until you cure it, and you have to walk back. Only the first is the article's "increased difficulty" problem. The second is a teaching problem and the third is a map layout problem. They have different owners and different fixes, and lumping them together is why this conversation never lands.
+
+==== No code changes: server configuration ====
+
+The penalty is already tunable in ''lib/config/settings'' without touching a line of C++. A server admin who thinks death hurts too much can act today:
+
+  * ''permanent_experience_percentage'' (default 50) - raise it and less exp is ever at risk. At 100 the exp penalty disappears entirely.
+  * ''death_penalty_percentage'' (default 20) and ''death_penalty_levels'' (default 3) - the two caps on a single death's exp loss. Lower either.
+  * ''stat_loss_on_death'' (default false) - already set to the merciful option, giving recoverable depletion rather than permanent stat loss. Worth knowing it exists, because true is much harsher.
+  * ''balanced_stat_loss'' (default false) - scales stat loss by level, gentler on low-level characters and harsher on high-level ones. Arguably the better setting for a game that wants new players to survive their first week, and the article's argument supports turning it on.
+
+NOTE: none of this is a map or code change. A public test server could run softened values for a season and compare retention, which is the monitoring point applied to the one variable that is already adjustable.
+
+==== No code changes: content and maps ====
+
+**Teach the cure at the point of pain.** A depleted player is standing at their savebed, which is in an inn or an apartment, which is a map somebody owns. A sign there naming the three cures - potion of life, restoration, praying at your god's altar - reaches every player at the exact moment the information is worth something. ''start/newbieshouse'' already has this text on a sign; it exists in precisely one place in the game.
+
+**Put the potions where the deaths are.** Potions of life are tiered by level: minor for under 5 (value 500), medium for under 30 (3000), major for under 50 (10000), supreme for under 130 (20000). A level 4 character who dies needs a 500-value potion, which is affordable, and has no idea it exists. Stocking them visibly in temple and healer shops near starting content, with a sign, costs nothing.
+
+**Say it in the temples.** Every temple map with an altar is a place where the cure is free. An NPC or sign in each of the ten temples whose god grants restoration, stating plainly that praying here long enough will restore stats lost to death, would close most of the gap on its own. It also gives the temples a reason to exist for non-priests.
+
+**Shorten the walk.** 155 maps in the set contain a ''bed_save'', concentrated in cities. The pain of death for an experienced player is not the exp, which regenerates, it is the trip back. Inns or camps with savebeds near major dungeon clusters are a pure map-side fix and need no permission from anybody.
+
+**Use the gravestone.** It is already placed on the exact square where the player died, with the killer's name on it. Map authors can lean on that as a landmark - a returning player can find where they died. It is also, incidentally, the closest thing Crossfire already has to death-location tracking, just rendered as an object instead of a log line.
+
+==== No code changes: data files ====
+
+''lib/help/death.en'' already exists and is genuinely good - it explains savebed transport, exp loss, depletion, the potion tiers, where to buy them (House of Healing in Scorn), and praying at your cult's altar. Somebody wrote the right document years ago.
+
+The problem is discovery. It sits in ''lib/help'' among 96 files that are otherwise almost entirely command references, and reaching it requires typing ''help death'', which requires already suspecting that a topic named "death" exists. Fixes that are text edits, not code:
+
+  * Point at it from ''lib/def_help'', which is currently eight lines about how to use ''help'' and how to file a bug.
+  * Reference it in the ''motd'' and in the ''rules'' file.
+  * Put its content in an in-game book in the starting area, and on the sign by the savebed.
+  * Add ''knowledge_marker'' to that sign so the lesson persists in the player's ''knowledge'' list.
+
+==== Code changes ====
+
+Ordered roughly by cost. The first two are almost free and worth doing regardless of what else gets decided.
+
+=== Tell the player what just happened ===
+
+The death sequence ends with ''draw_ext_info(... "YOU HAVE DIED.")'' and nothing else. The player is not told how much exp they lost, which skills lost it, which stat was depleted, or that the depletion is curable. Every one of those numbers is already computed a few lines earlier.
+
+**Change:** have ''apply_death_exp_penalty()'' return a summary and print it with the death message - total exp lost, the worst-hit skill, the depleted stat by name, and a one-line pointer to ''help death''. Roughly 30 lines across ''common/living.cpp'' and ''server/player.cpp''. **Risk:** none, it is pure output with no rules change.
+
+This is the highest value-to-effort item on the list. Most of the perceived cruelty of Crossfire death is that it happens silently. Going further, a death message that named the attacktype that finished you would teach most of the resistance system over a few characters.
+
+=== Make the gravestone do what its comment says ===
+
+''server/player.cpp:3726'' opens with "Put a gravestone up where the character 'almost' died. **List the exp loss on the stone.**" The code below it writes name, title, and killer, and no exp loss. The comment has been lying for years.
+
+**Change:** add the loss figures to the gravestone ''msg''. Ten lines, and it makes the death location self-documenting for the player who walks back. **Risk:** none.
+
+=== Log deaths in a machine-readable form ===
+
+The enabling change for the death-location aggregation further down this page, and it belongs here because ''kill_player()'' is where the data is.
+
+**Change:** one log line per death with map path, x, y, player level, killer name, and exp lost - either a dedicated file or a plugin hook, perhaps 20 lines. **Risk:** disk growth and privacy on a public server; log rotation and player-name hashing handle both.
+
+Everything the monitoring section wants falls out of this, and it makes every other proposal here testable instead of arguable.
+
+=== Stop taxing skills the player was not using ===
+
+The per-skill loop in ''apply_death_exp_penalty()'' hits every skill with exp. Dying to a monster should not cost you bargaining progress.
+
+**Change:** a new setting, ''death_penalty_skills'', with values ''all'' (current behaviour, the default) or ''used'', where ''used'' restricts the penalty to the skill applied at time of death plus the total-exp hit. **Risk:** low, and gated behind a setting that defaults to today's behaviour. Needs a decision on which skill counts when a player dies to a trap or to poison with no skill applied - falling back to the total-exp hit alone is fine.
+
+=== A floor for low-level characters ===
+
+''balanced_stat_loss'' already recognises that low-level characters suffer disproportionately, but only for stats. Exp has no such protection, and a level 3 character losing 20 percent of a small number still loses a meaningful fraction of their week.
+
+**Change:** ''death_penalty_min_level'', default 0 to preserve current behaviour, below which no exp is lost and depletion is skipped. Three lines in ''apply_death_exp_penalty()'' and a guard in the stat block. **Risk:** exploitable only by staying low level, which is self-limiting.
+
+=== Soul recovery at the gravestone ===
+
+The classic answer to this problem in the wider genre, and Crossfire is one object away from it. The gravestone already exists, already sits on the square where you died, and is already named after you.
+
+**Change:** stash the lost exp on the gravestone at creation. A player who returns and applies their own gravestone recovers some fraction of it - half is the conventional number - and the stone crumbles. Non-owners get nothing, and expiry is automatic because the stone goes with the map reset.
+
+This converts the penalty from a tax into content. The player who died gets a reason to go back in with the same monsters still there, which is exactly the backward callback the article likes, and it self-balances: recovering the exp means surviving the thing that killed you.
+
+**Risk:** the real one. In a shared-economy game, exp recovery has to be owner-locked or it becomes a trade good, and a player who dies repeatedly in one room should not stack ten stones. Cap it at one recoverable stone per player, replace on new death, and make the fraction a setting. **Effort:** moderate - a new apply handler for the gravestone plus owner tracking. This is the one to prototype on a test server rather than commit to.
+
+=== Depletion decay ===
+
+**Change:** an optional setting that removes one point of depletion per N hours of play time, so a player who never learns about praying is not permanently weakened.
+
+**Risk:** it undercuts the potion economy and the temples, which is a real cost. Better to fix the teaching than route around it, and this is listed mainly to argue against it - if the information problem is solved, depletion stops being a trap and this becomes unnecessary.
+
+=== Make help text reflect the running server ===
+
+''death.en'' says loss amounts "vary by server configuration" because it cannot know them. The server does.
+
+**Change:** allow simple substitution tokens in help files so the topic can state the actual ''death_penalty_percentage'' this server runs. Small, and it applies to more than this one file.
+
+==== Before tuning anything ====
+
+Every number in the configuration section is a knob somebody can turn on opinion. The death log is 20 lines and it is what turns this into evidence - same conclusion as everywhere else on this page.
+
+And watch the multiplayer angle. Any change here interacts with the shared economy: soul recovery is tradeable if you are careless, depletion decay devalues potions of life, and a lighter penalty changes the risk calculus for high-level players farming low-level content. None of these is a blocker, but each needs the party and economy case thought through before it ships.
 
 ===== What does not apply cleanly =====
 
