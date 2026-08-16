@@ -754,11 +754,13 @@ The objection stands: in a persistent game with a shared economy, scaling diffic
 
 But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The generator has a declared, per-level difficulty ramp — the one thing the hand-built dungeons were measured above as almost never having.**
 
-And it is almost entirely unused. Of **316 random-map entrances on the overworld**, ''difficulty_increase'' is set on exactly **one**. Nearly half declare ''dungeon_depth 1'', a single level, where no ramp is possible at all.
+And it is almost entirely unused. Of the 343 random-map entrances in the set, 157 are doors into buildings and 94 are the generic ''exit'' object that gives no clue what it leads to. That leaves **92 genuine descents — holes, cave mouths, stairs, ladders — with a median ''dungeon_depth'' of 2 and some as deep as 30 and 99. Exactly one of the 92 sets ''difficulty_increase''.** The rest generate every level of a multi-level dungeon at the same difficulty.
+
+NOTE: an earlier draft of this section claimed nearly half of all entrances declare ''dungeon_depth 1'' and so cannot ramp. That was wrong, and the way it was wrong is worth keeping. Those are houses, and ''dungeon_depth 1'' is the //correct// setting for a front door — the number only looked alarming because the scan counted buildings as failed dungeons. Segmenting by entrance type dropped the queue from 158 to zero: no building has a depth above 1, no unclassified exit has depth 1, and the single depth-1 descent is a ladder into a cellar in a map called "The Random House". The map set is internally consistent here. The unused //ramp// is the real finding; the missing //depth// was an artefact of the measurement.
 
 NOTE: the first draft of the bullet above also credited Crossfire with "party/level-scaled content." There is no such thing. Nothing in the random map generator reads player level or party size — the difficulty of a random dungeon comes from the ''dungeon_level'' the map author typed into the exit, and it is the same for a level 2 character and a level 60 one. The scaling is authored, not adaptive, which is the point.
 
-So the local equivalent of the article's magic sauce is not adaptive scaling, it is: **use the scaling that already ships**. Setting ''dungeon_depth'' above 1 and ''difficulty_increase'' to something sensible is a per-entrance edit in a ''msg'' block, costs nothing, needs no engine work, and produces exactly the shape the article asks for in the one part of the game that can generate it automatically.
+So the local equivalent of the article's magic sauce is not adaptive scaling, it is: **use the ramp that already ships**. Adding ''difficulty_increase'' to the 91 deep entrances that lack it is a one-line edit per entrance in a ''msg'' block, costs nothing, needs no engine work, and produces exactly the shape the article asks for in the one part of the game that can generate it automatically. The depths are already there — a 30-level dungeon that generates all 30 levels at the same difficulty is one line away from being a staircase.
 
 ==== Never allow skipping unskilled sections ====
 
@@ -861,7 +863,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
   - Add a vestibule to the maps whose first hostile is within one or two tiles of the entry point.
   - Put savebeds near the major dungeon clusters, and a cure sign beside each one.
   - Give each temple whose god grants restoration an NPC or sign that says so. Ten of the eleven gods qualify.
-  - Set ''dungeon_depth'' and ''difficulty_increase'' on the overworld's random-map entrances. 316 of them exist and one uses the ramp.
+  - Add ''difficulty_increase'' to the 91 multi-level random-map descents that lack it. Their depths are already set — some 30 and 99 levels — and every level currently generates at the same difficulty.
 
 **Tier 3 — small engine changes, each independently useful.**
 
