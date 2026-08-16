@@ -522,9 +522,17 @@ connected 66685
 end
 </code>
 
-The full demand list across those five squares runs to gold nuggets, sulphur, ruby, bat wing, four different colours of rose, a demon's head, mint, salt, an apple, a mace, and a rock. The map contains no sign, no ''magic_mouth'', no ''rune_mark'', no NPC ''@match'' dialogue, and no readable book — the only two book-shaped objects are scenery bookshelves with no message. Nothing anywhere on the map indicates that those squares are different from any other square, let alone which of a dozen items each one wants.
+The full demand list across those five squares runs to gold nuggets, sulphur, ruby, bat wing, four different colours of rose, a demon's head, mint, salt, an apple, a mace, and a rock. The map contains no sign, no ''magic_mouth'', no ''rune_mark'', no NPC ''@match'' dialogue, and no readable book — the only two book-shaped objects are scenery bookshelves with no message. The altar squares themselves sit on plain ''woodfloor2'', sharing their tiles with nothing else at all.
 
-This is the article's "don't" in its purest available form. The mechanism is invisible, the requirement is unguessable, and there is no in-game path to the answer. A player either has the wiki open or they do not finish the map.
+**And then it gets worse, because the effect is off-screen too.** Each altar's ''connected'' value drives a ''spikes_open'' — type 91, ''dam 8'' — and all fifty of them sit in a 13x13 block at the far corner of the map, **34 tiles from the nearest altar**. That block is not dead space either: it is flagstone ringed by ''blocked'' walls and holds ten boulders and ten ''button_small'', which is to say a boulder-pushing puzzle room the player is meant to solve.
+
+The two systems in that room have **no connection to each other**. The buttons use connections ''1'' and ''99961''–''999610''; the altars use the ''666xx'' range; the overlap is zero. So the spikes in the puzzle room are driven //only// by what somebody dropped on an unmarked floor square thirty-four tiles away.
+
+That is past "unguessable" and into something with no feedback loop at all. The player cannot see that the cause square is special, cannot see the effect, and cannot associate the two even by accident — trial and error does not solve this, because nothing observable changes where the player is standing.
+
+**It is also copy-paste.** Normalised to their origin, the five altar squares form the identical arrangement in all four maps — ''(0,1) (0,2) (1,0) (2,1) (2,2)'', a five-square arch — and ''cdcapart1'' stamps that same block four times in a 2x2 grid for 200 altars. Same sixteen-item demand list, same fifty-altars-to-fifty-spikes wiring, in maps ranging from 15x16 to 99x99, all four by one author between February and August 2004. The tell is ''cdcspire/cdcspireexit1'': a 15x16 map whose //entry point is one of the altar squares//. The block was pasted in without regard to where the player arrives.
+
+NOTE: that changes the fix. A designed puzzle needs signage. Machinery pasted into four maps of wildly different scale, driving spikes out of sight, more likely wants removing — and that is one conversation with whoever knows what it was for, not four map-authoring jobs.
 
 ==== The good case ====
 
@@ -564,7 +572,11 @@ This one is nearly fine. The required item is physically present, so a thorough 
   - Scenery does not count. A ''bookshelf'' is furniture; only a readable with a ''msg'' teaches anything.
   - Where the answer lives on another map, put a thread between them.
 
-The audit that finds these is ''tools/difficulty-scan item-gates'', which does the proximity and text matching rather than counting objects. Its 314-map queue is too long to clear in one sitting, but the 12 maps carrying invisible item-keyed altars are a short enough list to review by hand this afternoon — and four of those twelve are one author's mechanism in ''mlab/citydeclouds'', replicated across four maps with the same 16-item demand list and carrying 315 of the 389 invisible altars between them. Two of the four have no readable text anywhere on the map at all.
+The audit that finds these is ''tools/difficulty-scan item-gates'', which does the proximity and text matching rather than counting objects. Its 314-map queue is too long to clear in one sitting, but the 12 maps carrying invisible item-keyed altars are a short enough list to review by hand this afternoon — and four of those twelve are the one copy-pasted mechanism described above, carrying 315 of the 389 invisible altars between them.
+
+**Worth saying plainly, because it would be easy to draw the wrong conclusion: ''mlab/citydeclouds'' is not a badly built map set.** Across its 154 maps, only 43 carry hostile monsters at all, and on the measure this page cares most about it is **better than the rest of the map set — a median of 11 tiles from the entry point to the first hostile, against 4 everywhere else**. Those maps are large and open and they give a player room to arrive. It is unremarkable on silence too (44 percent of its dangerous maps carry no text, against 41 percent elsewhere).
+
+Where it does stand out is the difficulty header: 67 percent of its maps declare 1 against 57 percent elsewhere, and six declare between 100 and 115 where the server's own estimate would be 25 — ''cdcunderbigstre1'' declares 100 while holding 732 hostiles. That is the same field-misuse the difficulty saw section describes, just concentrated in one place. One map set, two unrelated problems, and neither of them is "the maps are bad."
 
 ===== Adrenaline pacing and backward callbacks, expanded =====
 
