@@ -536,6 +536,8 @@ def random_maps(mapset, arches, **_):
     with_ramp = 0
     single_level = 0
     overworld = 0
+    flat_descents = 0
+    by_kind = Counter()
 
     for path, mapfile in sorted(mapset.maps.items()):
         for obj in mapfile.objects:
@@ -549,30 +551,40 @@ def random_maps(mapset, arches, **_):
             depth = params.get("dungeon_depth", "")
             if params.get("difficulty_increase"):
                 with_ramp += 1
+            kind = arches.entrance_kind(obj.arch)
+            by_kind[kind] += 1
             if depth in ("", "1"):
                 single_level += 1
+                if kind == "descent":
+                    flat_descents += 1
             if path.startswith("world"):
                 overworld += 1
             rows.append((
-                path, obj.x, obj.y, obj.arch,
+                path, obj.x, obj.y, obj.arch, kind,
                 params.get("dungeon_level", ""), depth,
                 params.get("difficulty_increase", ""),
                 params.get("layoutstyle", ""),
             ))
 
     total = len(rows)
+    descents = by_kind["descent"]
     summary = [
         f"random-map entrances: {total} ({overworld} of them on the world tiles)",
+        f"  by kind: {by_kind['building']} buildings, {descents} descents, "
+        f"{by_kind['unclassified']} unclassified",
         f"  setting difficulty_increase (the per-level ramp): {with_ramp} "
         f"({_pct(with_ramp, total):.0f}%)",
-        f"  single-level, where no ramp is possible: {single_level} "
-        f"({_pct(single_level, total):.0f}%)  <- work queue",
+        f"  single-level entrances of any kind: {single_level} "
+        f"({_pct(single_level, total):.0f}%) - mostly correct, see caveats",
+        f"  single-level DESCENTS, where a ramp would make sense: "
+        f"{flat_descents} of {descents}  <- work queue",
     ]
 
+    rows.sort(key=lambda r: (r[4] != "descent", r[0]))
     return Report(
         "random-maps",
         "Random-map entrances and their generation parameters",
-        ("map", "x", "y", "arch", "dungeon_level", "dungeon_depth",
+        ("map", "x", "y", "arch", "kind", "dungeon_level", "dungeon_depth",
          "difficulty_increase", "layout"),
         rows,
         summary,
@@ -581,6 +593,11 @@ def random_maps(mapset, arches, **_):
             "difficulty_increase (random_maps/random_map.cpp).",
             "Nothing here reads player level or party size; the scaling is "
             "authored, not adaptive.",
+            "dungeon_depth 1 is the RIGHT setting for a building. A front door "
+            "should not open onto a five-level dungeon, so buildings are "
+            "excluded from the queue rather than counted as a defect.",
+            "'unclassified' is the generic exit object and friends, which give "
+            "no clue what they lead to. Those need a human look, not a rule.",
         ],
     )
 

@@ -60,6 +60,7 @@ class Archetypes:
         self.books = set()
         self.display_name = {}  # arch name -> human-readable name
         self.exp = {}  # arch name -> stats.exp, for the difficulty estimate
+        self.source = {}  # arch name -> path within the arch tree
         self._load()
 
     def _load(self):
@@ -70,6 +71,7 @@ class Archetypes:
                     self._read_arc(os.path.join(dirpath, filename))
 
     def _read_arc(self, path):
+        rel = os.path.relpath(path, self.root)
         name = None
         attrs = {}
         with open(path, encoding="utf-8", errors="ignore") as handle:
@@ -78,6 +80,7 @@ class Archetypes:
                 match = _OBJECT_RE.match(line)
                 if match:
                     name, attrs = match.group(1), {}
+                    self.source[name] = rel
                     continue
                 if line.strip() == "end":
                     if name:
@@ -109,6 +112,29 @@ class Archetypes:
         exp = attrs.get("exp")
         if exp and exp.lstrip("-").isdigit():
             self.exp[name] = int(exp)
+
+    def entrance_kind(self, arch_name):
+        """Is this entrance a door into a building, or a way down?
+
+        It matters because ``dungeon_depth 1`` is the //correct// setting for a
+        house - a front door should not open onto a five-level dungeon - so
+        buildings must be excluded before counting missing depth as a defect.
+
+        Classification follows the arch tree's own layout rather than a
+        hardcoded name list: construct/ holds buildings, ground/ holds terrain
+        features like pit holes and cave mouths, and exit/ holds both stairs
+        and the generic exit object that could be anything.
+        """
+        path = self.source.get(arch_name, "").lower().replace(os.sep, "/")
+        if "construct/" in path:
+            return "building"
+        if "ground/" in path or "/up_down/" in path or "/ladder/" in path:
+            return "descent"
+        name = arch_name.lower()
+        if any(k in name for k in ("hole", "cave", "well", "stair", "ladder",
+                                   "pit", "mine", "crypt", "tomb")):
+            return "descent"
+        return "unclassified"
 
     @property
     def hostile(self):
