@@ -671,7 +671,79 @@ None of the first three requires touching C++, a build, or a server restart beyo
 
 **"Never allow skipping unskilled sections."** Crossfire is an open world on purpose. You cannot enforce sequence, and trying to would be a worse game. The article's advice here is platformer-specific.
 
-**Formal QA, expo testing, review sites.** No budget, no publisher, no funnel. The analog is a public test server plus new-player feedback threads.
+**Formal QA, expo testing, review sites.** No budget, no publisher, no funnel. The analog is a public test server plus new-player feedback threads. Expanded below.
+
+===== What does not apply cleanly, expanded =====
+
+For each of these the useful question is not "does this port" - it does not - but "what is the local equivalent, and does it already exist." In all three cases something equivalent does exist and is underused. There is also a fourth category the original list missed, which is the most important thing in this section.
+
+==== Dynamic difficulty adjustment ====
+
+The objection stands: in a persistent game with a shared economy, scaling difficulty per player breaks exp and loot fairness and is trivially exploitable. Nothing below changes that.
+
+But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The procedurally generated content has the rising curve that the hand-built content does not** - which is a slightly embarrassing thing to have to write directly after measuring that 32 percent of hand-built dungeons are flat at every depth.
+
+And it is almost entirely unused. Of **316 random-map entrances on the overworld**, ''difficulty_increase'' is set on exactly **one**. Another 153 declare ''dungeon_depth 1'', a single level, where no ramp is possible at all.
+
+So the local equivalent of the article's magic sauce is not adaptive scaling, it is: **use the scaling that already ships**. Setting ''dungeon_depth'' above 1 and ''difficulty_increase'' to something sensible is a per-entrance edit in a ''msg'' block, costs nothing, needs no engine work, and produces exactly the shape the article asks for in the one part of the game that can generate it automatically.
+
+==== Never allow skipping unskilled sections ====
+
+Correct that this is platformer-specific and that enforcing sequence would make Crossfire a worse game. The open world is the point.
+
+The substitute is to **inform rather than gate**. A player who walks into content twelve levels above them has not broken the game; they have made a decision without information. Two things convert that from a trap into a choice, and both are covered elsewhere on this page: signage at the entrance so the decision is informed, and a death penalty mild enough that being wrong is a setback rather than an evening lost.
+
+Worth noting that geography already provides soft sequencing - distance from Scorn correlates loosely with danger - and that this is the right kind of gating, because it is legible and the player can override it deliberately.
+
+==== Formal QA, expo testing, review sites ====
+
+No budget, no publisher, no funnel, all true. But "a public test server plus feedback threads" undersells what is available, because the map set is machine-readable and some of the tooling already ships with the server.
+
+  * **''utils/mapper''** generates web pages listing every map, item, monster, and region - and it does so as the server sees them, with random treasure resolved rather than left as markers. That is a QA pass over content that does not exist until generation time.
+  * **''utils/maps-to-dot''** emits a GraphViz digraph of map interconnections per region, with nodes linking to Crossfire Atlas. NOTE: the exit-graph scan behind the difficulty saw section above duplicates this. Use the existing tool.
+  * **111 unit test files** live under ''test/unit''. Automated testing is an established practice here, just not aimed at content.
+  * The **monitoring** section is the funnel substitute. Completion drop-off per dungeon is the same measurement a publisher would buy from a playtest lab, taken from actual players instead.
+
+The honest gap is not tooling and not testers. It is that nothing currently runs these on a schedule and puts the output where map authors will see it.
+
+==== The category the original list missed ====
+
+Some of the article's advice does not conflict with Crossfire's shape - it conflicts with Crossfire's **written policy**, which is a different problem and needs a different fix.
+
+''Info/mapguide'' is the project's own guide to what makes an acceptable map, and its rule 11 reads:
+
+<code>
+11) Try to keep the difficulty throughout the map(s) about the same.
+The first monster in the map should not be the most difficult monster,
+nor should the last monster be orders of magnitude more difficult
+than anything before it.
+</code>
+
+Read fairly, that rule is aimed at the unkillable-final-monster problem, and it explicitly allows monsters to increase in difficulty. But it has no concept of a deliberate //dip//, and its plain reading - keep difficulty about the same throughout - is the opposite of the saw. **The 32 percent of dungeons that are flat at every depth are not neglect. They are compliance.**
+
+That reframes several findings on this page. Authors were told to do this. Any argument for the saw has to go through amending rule 11, not through persuading individual authors to quietly disagree with the guide.
+
+The reverse is also true, and it is the more uncomfortable half. Two of this page's central recommendations are //already// mapguide rules and simply are not followed:
+
+  * **Rule 9** requires a warning sign, gate, or door at entrances to content that will kill a low-level character. 14 percent of monster-bearing overworld entrances have any signage within three tiles.
+  * **Rule 5** requires that a map state near its entrance when a specific skill, class, or spell is needed to complete it, and warns against hidden rooms whose only clue is luck. That is the hidden-mechanics section, written down as policy years ago.
+
+NOTE: mapguide states that its rules are ordered by importance and that a lower number takes precedence in a conflict. Rule 5 therefore outranks rule 11, which means the guide already resolves the "should the map explain itself" question in favour of explaining.
+
+A proposed amendment, keeping rule 11's actual intent:
+
+<code>
+11) Difficulty should rise across a map or map set, but not in a single
+jump.  The first monster should not be the most difficult, and the last
+should not be orders of magnitude beyond anything before it.  Where a map
+introduces a new mechanic, it is correct to lower monster pressure while
+it is introduced and raise it afterwards - a deliberate dip is not the
+inconsistency this rule is warning against.
+</code>
+
+==== What this section is really saying ====
+
+Two of the three "does not apply" items turn out to have a working local equivalent that nobody uses, and the third is a policy conflict rather than a design one. That is a better position than the original bullets implied - the gap between Crossfire and the article's advice is mostly unused capability and one paragraph in a text file, not missing systems.
 
 ===== What Crossfire should actually adopt =====
 
@@ -706,6 +778,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
   - Convert ''doc/survival-guide.txt'', ''doc/skills.txt'', and ''doc/runes-guide.txt'' into help topics. The text is written; this is editing.
   - Write the missing topics: item power, spell paths, praying and gods, resistances, curses, literacy, encumbrance, alchemy, weapon improvement.
   - Add ''knowledge_marker'' to signs and books that already describe a monster, god, or recipe. Three files in the whole map set currently use it.
+  - Amend ''Info/mapguide'' rule 11, which currently tells authors to keep difficulty flat and is the reason a third of dungeons are. Draft wording is in the section above.
 
 **Tier 2 - map work, with a queue the scans already produce.**
 
@@ -715,6 +788,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
   - Add a vestibule to the maps whose first hostile is within one or two tiles of the entry point.
   - Put savebeds near the major dungeon clusters, and a cure sign beside each one.
   - Give each temple whose god grants restoration an NPC or sign that says so. Ten of the eleven gods qualify.
+  - Set ''dungeon_depth'' and ''difficulty_increase'' on the overworld's random-map entrances. 316 of them exist and one uses the ramp.
 
 **Tier 3 - small engine changes, each independently useful.**
 
