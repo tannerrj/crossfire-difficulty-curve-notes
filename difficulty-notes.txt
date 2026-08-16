@@ -37,6 +37,14 @@ So the gap between Crossfire and the article's advice is mostly unused capabilit
 
 Figures come from scanning the map set, the archetype tree, and the server source rather than from the wiki, and file and line references are given so they can be checked. Where a scan has a known bias, it is stated next to the number — several do, and the caveat is usually more useful than the figure.
 
+The scans are in this repository as ''tools/difficulty-scan'', so every figure below can be regenerated rather than trusted:
+
+<code>
+cd tools && ./difficulty-scan all --csv out/
+</code>
+
+NOTE: writing that tool changed some of these numbers. The first draft of these notes used throwaway scripts that matched a hardcoded handful of exit archetypes instead of the 1,055 that carry object type 66, and counted every monster archetype as a threat including the 82 that are peaceful by default. The dungeon-shape and entrance-signage figures below are the corrected ones. That is the argument for having a tool at all: a number nobody can re-run is a number nobody can correct.
+
 ==== What all of it is missing ====
 
 Every measurement here is static — what an author declared, what objects a map contains, how far the first monster is from the door. None of it measures what a player actually experienced. That is what the monitoring section is for, and it is why that work sits at the top of the list of things to build.
@@ -83,14 +91,14 @@ NOTE: this is the trap in the difficulty audit proposed at the bottom of this pa
 
 Declared difficulty is still the best available record of what an author //intended//, so it is worth asking what shape it traces through a dungeon. Building a map graph from exit objects, grouping by directory, filtering to groups of three or more linked maps where most maps contain monsters — which drops the guild halls, shop rows, and apartment blocks — and walking outward from whichever map is entered from outside the group:
 
-  * **136 monster-bearing multi-map dungeons** qualify, a median of 5 maps each.
-  * **32 percent are flat** — the same declared difficulty at every depth, from the entrance to the bottom.
-  * 68 percent vary with depth. Of those, **51 percent rise strictly**, never dipping once.
-  * The remaining **49 percent of graded dungeons contain a dip somewhere** — but reading them, the dips mostly land at the //end//, not after an introduction: ''euthville'' runs 15, 15, 15, 15, 15, 15, 18, 13, and ''darcap/castle'' runs 12, 1, 1, 1. That is the last level being softer than the one before it, which is inconsistency rather than pacing.
+  * **79 monster-bearing multi-map dungeons** qualify, a median of 5 maps each.
+  * **4 are flat** — the same declared difficulty at every depth, from the entrance to the bottom. ''scorn/kar'' runs 8 across nine maps; ''brest/Castle'' runs 20 across five.
+  * The other **75 vary with depth. Of those, 43 — 57 percent — rise strictly**, never dipping once.
+  * The remaining **32 contain a dip somewhere**. But half of those dips land on the //final// level: ''brest/brittany'' runs 31, 36, 41, 40 and ''quests/greyshield'' runs 32, 35, 35, 39, 78, 50. That is a dungeon softening at the end, not making room for something new.
 
-So the honest summary is not "Crossfire has the wrong shape." It is that **a third of dungeons are a flat line, half the rest are a pure ramp, and the dips that do exist are not placed where a saw would put them.** Nothing in the map set reads as an author deliberately dropping intensity to make room for a new idea.
+So the honest summary is not "Crossfire has the wrong shape," and it is not that dungeons are flat — hardly any are. It is that **the overwhelmingly common shape is a pure ramp. 43 of 75 graded dungeons never dip once, and half the dips that do exist are the last level being easier than the one before it.** Almost nothing in the map set reads as an author deliberately dropping intensity to make room for a new idea, which is the one thing the saw is actually asking for.
 
-The exceptions are worth naming, because they show it is achievable within the existing format. ''navar_city/mlab'' grades 47 linked maps across 15 distinct values from 1 to 90. ''quests/peterm/FireTemple'' runs 14 maps across 10 values from 8 to 60. ''brest/asyvan'', ''pup_land/s_f'', and ''sisters'' are all in the same territory.
+The best-graded dungeons are worth naming, because they show a wide range is achievable within the existing format. ''navar_city/mlab'' grades 56 linked maps across 11 distinct values from 38 to 75. ''quests/peterm/FireTemple'' runs 14 maps across 7 values from 8 to 60. ''pup_land/nurnberg/reception'', ''pup_land/castle_eureca'', and ''darcap/temple_justice'' are all in the same territory. NOTE: a wide range is not the same as a saw — ''nurnberg/reception'' spans 8 to 25 and rises monotonically the whole way.
 
 NOTE: three caveats on all of the above. This measures **declared** difficulty, which is author intent and not what a player feels — the death data from the monitoring section is what would measure the second. Using a directory as the boundary of a dungeon is a proxy that will merge some things and split others. And depth is breadth-first distance from whichever map is entered from outside, which is wrong for any dungeon with two entrances.
 
@@ -117,7 +125,13 @@ The ''difficulty'' header should then be written to follow that shape rather tha
 
 ==== Making it measurable ====
 
-The graph scan behind the numbers above is small — resolve exit ''slaying'' paths, group by directory, walk outward from the entrance — and it produces a per-dungeon difficulty sequence that an author can read at a glance. Run against the whole set it gives three work queues: the flat dungeons, the maps declaring 1 with monsters on them, and the dungeons that end softer than they peaked. NOTE: ''utils/maps-to-dot'' in the server tree already builds the exit graph half of this, so the work is a difficulty overlay on an existing tool rather than a new one.
+The graph scan behind the numbers above is in this repository as ''tools/difficulty-scan'' — resolve exit ''slaying'' paths, group by directory, walk outward from the entrance — and it produces a per-dungeon difficulty sequence that an author can read at a glance:
+
+<code>
+./difficulty-scan dungeon-shape --csv out/
+</code>
+
+It gives three work queues: the 4 flat dungeons, the **142 maps declaring ''difficulty 1'' with hostile monsters on them**, and the 16 dungeons that end softer than they peaked. NOTE: ''utils/maps-to-dot'' in the server tree already builds the exit-graph half of this, so a future version should be a difficulty overlay on that rather than a second walker.
 
 Joined against the death data from the monitoring section, it answers the question this whole page keeps circling: does declared difficulty have anything to do with where players actually die?
 
@@ -246,7 +260,9 @@ end
 
 ==== Making it measurable ====
 
-This list has the same problem as the rest of these notes — it is all taste until something counts it. The counting is cheap here: teaching objects are archetypes, so a scan for ''magic_mouth'', ''rune_mark'', ''sign'', and ''knowledge_marker'' per map is the same kind of pass [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already makes for monsters and treasure. Cross that count against the map's ''difficulty'' and its monster list and the output is a short list of maps that are hard and say nothing, which is the actual thing worth fixing. NOTE: a bare object count flatters the map set badly — see the hidden-mechanics section below for why ''bookshelf'' and "Dungeon Master's Lounge" both score as teaching.
+This list has the same problem as the rest of these notes — it is all taste until something counts it. ''tools/difficulty-scan teaching-objects'' does the counting: teaching objects per map against how dangerous that map is, which is the same kind of pass [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already makes for monsters and treasure. **Of the 1,062 maps carrying hostile monsters, 432 — 41 percent — hold no sign, mouth, rune, readable, or NPC dialogue at all.** That is the list of maps that are dangerous and say nothing, and it is the actual thing worth fixing.
+
+NOTE: a bare object count flatters the map set badly, which is why the scan counts only objects carrying text — see the hidden-mechanics section below for why ''bookshelf'' and "Dungeon Master's Lounge" would otherwise both score as teaching. Even so, presence is not usefulness: 41 percent is the floor, not the answer.
 
 ===== Who Crossfire is actually for, expanded =====
 
@@ -482,7 +498,11 @@ The obvious measurement is "gated maps containing no sign, book, rune, mouth, or
   * ''scorn/temples/gorokh_final'' contains a sign. It reads "Dungeon Master's Lounge."
   * Guild maps are full of gates keyed on ''Stove'', ''Forge'', ''Cauldron'', and ''TanningDesk'' — crafting furniture, explained by the act of joining a guild, not really puzzles at all.
 
-A useful audit has to check three things, not one: that a teaching object exists, that it is **near** the gate, and that its text actually **names the requirement**. The third is the only one that matters and the only one nobody has scanned for.
+A useful audit has to check three things, not one: that a teaching object exists, that it is **near** the gate, and that its text actually **names the requirement**. The third is the only one that matters and the only one nobody had scanned for.
+
+''tools/difficulty-scan item-gates'' now does. Matching each gate's ''slaying'' string against the text of every readable within six tiles — on the archetype name, its underscore-free form, and its display name — **318 of the 464 gated maps, 69 percent, carry at least one player-facing gate that nothing in the map explains.** It also reports ''detector'' separately from ''altar_trigger'' and ''check_inv'', because detectors fire on spell effects and markers and are mostly machinery rather than puzzles; folding them in makes the map set look far worse than it is.
+
+NOTE: the match is literal, so a sign saying "bring roses" will not match a gate keyed on ''rose_white''. The 69 percent is an upper bound, and the rows are worth reading before anyone acts on the number.
 
 ==== The bad case ====
 
@@ -544,7 +564,7 @@ This one is nearly fine. The required item is physically present, so a thorough 
   - Scenery does not count. A ''bookshelf'' is furniture; only a readable with a ''msg'' teaches anything.
   - Where the answer lives on another map, put a thread between them.
 
-The audit that would find the remaining cases is not the one already built — it needs proximity and text matching, not just object counts. But it is the same scan, and the 12 maps with invisible item-keyed altars are a short enough list to review by hand this afternoon.
+The audit that finds these is ''tools/difficulty-scan item-gates'', which does the proximity and text matching rather than counting objects. Its 318-map queue is too long to clear in one sitting, but the 12 maps carrying invisible item-keyed altars are a short enough list to review by hand this afternoon.
 
 ===== Adrenaline pacing and backward callbacks, expanded =====
 
@@ -557,8 +577,8 @@ The claim at the top of these notes — that most dungeons open at full intensit
   * **1,062 maps** qualify, excluding the world tiles, editor, test, template, and unlinked directories.
   * The **median distance to the first hostile is 5 tiles**.
   * 35 percent have one within 3 tiles, 59 percent within 5, 79 percent within 8, and 90 percent within 12.
-  * Median dungeon or town map area is 484 tiles, roughly 22x22, and 45 percent are 20x20 or smaller.
-  * Median monster density is 1.9 per 100 tiles, which is not high — the monsters are not crowded, they are just //immediately// present.
+  * Their median area is 625 tiles, roughly 25x25.
+  * Median hostile density on them is 3.5 per 100 tiles — so on a median map, roughly 22 hostiles spread over 625 squares. Not crowded. Just //immediately// present.
 
 Five tiles is inside the player's view on arrival. There is no vestibule, no approach, no beat where the player reads the room. The map starts and the fight starts.
 
@@ -566,13 +586,13 @@ NOTE: the measurement is Chebyshev distance and knows nothing about walls, so a 
 
 ==== What pacing looks like in map terms ====
 
-The article's saw shape needs somewhere to dip, and a 20x20 map with monsters five tiles from the door has nowhere. Concrete devices, all map-side:
+The article's saw shape needs somewhere to dip, and a 25x25 map with monsters five tiles from the door has nowhere. Concrete devices, all map-side:
 
 **The vestibule.** Three to five tiles of nothing between the entrance and the first threat. It costs almost no space and it is the single cheapest change on this list. The player arrives, sees the room, and chooses to advance — which turns the first fight from an ambush into a decision.
 
 **The breather room.** A lit, monster-free room in the middle of the dungeon. No treasure required, no puzzle, nothing to do but stand still and let spell points come back. The absence of threat is the content. NOTE: keep wandering monsters and generators out of it, or it is not a breather.
 
-**Modulated density rather than an even sprinkle.** A median of 1.9 monsters per 100 tiles spread evenly is a flat line. The same monster budget clustered into three pockets with quiet corridors between them is a saw. Same monsters, same exp, different experience.
+**Modulated density rather than an even sprinkle.** A median of 3.5 hostiles per 100 tiles spread evenly is a flat line. The same monster budget clustered into three pockets with quiet corridors between them is a saw. Same monsters, same exp, different experience.
 
 **Tension without damage.** Darkness, sound, a locked door that rattles, a corridor of gravestones, a boss visible through bars long before the player can reach it. All of these raise intensity without spending hit points, which is exactly what the low part of the saw is for.
 
@@ -625,7 +645,7 @@ Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**
   - Do not place the exit adjacent to the final encounter.
   - When building a chain, use ''parent'' and ''setwhen'' rather than a flat list of steps, and pick one state system — quest steps or dialogue semaphores — and stay in it.
 
-The entry-distance scan is about thirty lines and runs over the whole map set in seconds. Run per region, it produces a ranked list of the maps that open worst, which is a concrete work queue rather than an opinion about pacing.
+The entry-distance scan is ''tools/difficulty-scan entry-distance'' in this repository and runs over the whole map set in seconds. It produces a ranked list of the maps that open worst — **214 maps, 20 percent, have a hostile inside three tiles of the entry point** — which is a concrete work queue rather than an opinion about pacing.
 
 ===== Monitoring, expanded =====
 
@@ -720,9 +740,9 @@ For each of these the useful question is not "does this port" — it does not �
 
 The objection stands: in a persistent game with a shared economy, scaling difficulty per player breaks exp and loot fairness and is trivially exploitable. Nothing below changes that.
 
-But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The procedurally generated content has the rising curve that the hand-built content does not** — which is a slightly embarrassing thing to have to write directly after measuring that 32 percent of hand-built dungeons are flat at every depth.
+But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The generator has a declared, per-level difficulty ramp — the one thing the hand-built dungeons were measured above as almost never having.**
 
-And it is almost entirely unused. Of **316 random-map entrances on the overworld**, ''difficulty_increase'' is set on exactly **one**. Another 153 declare ''dungeon_depth 1'', a single level, where no ramp is possible at all.
+And it is almost entirely unused. Of **316 random-map entrances on the overworld**, ''difficulty_increase'' is set on exactly **one**. Nearly half declare ''dungeon_depth 1'', a single level, where no ramp is possible at all.
 
 NOTE: the first draft of the bullet above also credited Crossfire with "party/level-scaled content." There is no such thing. Nothing in the random map generator reads player level or party size — the difficulty of a random dungeon comes from the ''dungeon_level'' the map author typed into the exit, and it is the same for a level 2 character and a level 60 one. The scaling is authored, not adaptive, which is the point.
 
@@ -760,13 +780,13 @@ nor should the last monster be orders of magnitude more difficult
 than anything before it.
 </code>
 
-Read fairly, that rule is aimed at the unkillable-final-monster problem, and it explicitly allows monsters to increase in difficulty. But it has no concept of a deliberate //dip//, and its plain reading — keep difficulty about the same throughout — is the opposite of the saw. **The 32 percent of dungeons that are flat at every depth are not neglect. They are compliance.**
+Read fairly, that rule is aimed at the unkillable-final-monster problem, and it explicitly allows monsters to increase in difficulty. What it has no concept of is a deliberate //dip//. A ramp is compliant; a saw is not obviously so, and an author checking their work against rule 11 has no reason to build one.
 
-That reframes several findings on this page. Authors were told to do this. Any argument for the saw has to go through amending rule 11, not through persuading individual authors to quietly disagree with the guide.
+That is what the shape measurement above is really showing. Very few dungeons are flat, so this is not a story about authors keeping everything level — it is that **43 of 75 graded dungeons rise and never dip once**, which is precisely the shape rule 11 describes and endorses. Authors were told to do this, and they did. Any argument for the saw therefore has to go through amending rule 11, not through persuading individual authors to quietly disagree with the guide.
 
 The reverse is also true, and it is the more uncomfortable half. Two of this page's central recommendations are //already// mapguide rules and simply are not followed:
 
-  * **Rule 9** requires a warning sign, gate, or door at entrances to content that will kill a low-level character. 14 percent of monster-bearing overworld entrances have any signage within three tiles.
+  * **Rule 9** requires a warning sign, gate, or door at entrances to content that will kill a low-level character. 19 percent of monster-bearing overworld entrances have any signage within three tiles; 6 percent have it on an adjacent square.
   * **Rule 5** requires that a map state near its entrance when a specific skill, class, or spell is needed to complete it, and warns against hidden rooms whose only clue is luck. That is the hidden-mechanics section, written down as policy years ago.
 
 NOTE: mapguide states that its rules are ordered by importance and that a lower number takes precedence in a conflict. Rule 5 therefore outranks rule 11, which means the guide already resolves the "should the map explain itself" question in favour of explaining.
@@ -790,7 +810,7 @@ Two of the three "does not apply" items turn out to have a working local equival
 
   - **Audit the ''difficulty'' header against map contents.** 3,281 of 3,282 maps declare a value and 58 percent of them declare exactly 1, which suppresses the server's own estimate and pins treasure to the floor. The field also drives shop stock, skill-ident exp, and hiding, so the audit must segment by map type before comparing anything. [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half.
   - **Aggregate death locations.** Roll deaths up per map and per coordinate and the article's evenly-distributed-deaths test stops being an opinion. Everything else on this list gets easier once it exists.
-  - **Signal danger before the door.** 582 overworld entrances lead to a map containing monsters and 14 percent of them have a sign, magic mouth, or rune within three tiles. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is around 500 entrances long.
+  - **Signal danger before the door.** 302 overworld entrances lead to a map holding hostile monsters, and 19 percent of them have a sign, magic mouth, or rune within three tiles. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is 244 entrances long.
   - **Teach at the point of need, using the modalities that already exist.** Signs, marking runes, magic mouths, books, NPC ''@match'' dialogue, and ''knowledge_marker'' are all in the engine today and underused (map ''msg'' and region ''msg'' only surface on ''mapinfo'' and ''whereami'', so they are flavour rather than teaching). A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
   - **Give each dungeon a teaching room.** If a map's gimmick is spell-reflecting monsters, invisibility, or a timed gate, room one should demonstrate it somewhere survivable. This is a map-authoring convention, not code — worth writing into ''Info/mapguide''.
   - **Keep doing what the recent altar work does.** The last several commits added second altars to temples for multi-player friendliness. That is the article's "player diversity" principle applied without being told to — reducing contention so different player populations can use the same content. The same instinct should extend to chokepoints in quest maps.
@@ -823,9 +843,9 @@ Each expansion above ends with its own conventions. This is the sequence across 
 
 **Tier 2 — map work, with a queue the scans already produce.**
 
-  - Sign the 500-odd unsigned entrances to monster-bearing maps.
+  - Sign the 244 unsigned overworld entrances into monster-bearing maps.
   - Review the 12 maps carrying invisible item-keyed trigger altars, starting with ''mlab/citydeclouds/cwdcguestofmarquis1''.
-  - Fix the maps that declare ''difficulty 1'' with monsters on them, and the 43 dungeons that are flat at every depth.
+  - Fix the 142 maps that declare ''difficulty 1'' with hostile monsters on them, and the 4 dungeons that are flat at every depth.
   - Add a vestibule to the maps whose first hostile is within one or two tiles of the entry point.
   - Put savebeds near the major dungeon clusters, and a cure sign beside each one.
   - Give each temple whose god grants restoration an NPC or sign that says so. Ten of the eleven gods qualify.
