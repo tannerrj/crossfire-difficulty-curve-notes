@@ -786,7 +786,7 @@ That is what the shape measurement above is really showing. Very few dungeons ar
 
 The reverse is also true, and it is the more uncomfortable half. Two of this page's central recommendations are //already// mapguide rules and simply are not followed:
 
-  * **Rule 9** requires a warning sign, gate, or door at entrances to content that will kill a low-level character. 19 percent of monster-bearing overworld entrances have any signage within three tiles; 6 percent have it on an adjacent square.
+  * **Rule 9** requires a warning sign, gate, or door at entrances to content that will kill a low-level character. 80 percent of the doors into monster-bearing maps have nothing within three tiles; only 6 percent of entrance squares have signage on an adjacent one.
   * **Rule 5** requires that a map state near its entrance when a specific skill, class, or spell is needed to complete it, and warns against hidden rooms whose only clue is luck. That is the hidden-mechanics section, written down as policy years ago.
 
 NOTE: mapguide states that its rules are ordered by importance and that a lower number takes precedence in a conflict. Rule 5 therefore outranks rule 11, which means the guide already resolves the "should the map explain itself" question in favour of explaining.
@@ -810,7 +810,7 @@ Two of the three "does not apply" items turn out to have a working local equival
 
   - **Audit the ''difficulty'' header against map contents.** 3,281 of 3,282 maps declare a value and 58 percent of them declare exactly 1, which suppresses the server's own estimate and pins treasure to the floor. The field also drives shop stock, skill-ident exp, and hiding, so the audit must segment by map type before comparing anything. [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half.
   - **Aggregate death locations.** Roll deaths up per map and per coordinate and the article's evenly-distributed-deaths test stops being an opinion. Everything else on this list gets easier once it exists.
-  - **Signal danger before the door.** 302 overworld entrances lead to a map holding hostile monsters, and 19 percent of them have a sign, magic mouth, or rune within three tiles. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is 244 entrances long.
+  - **Signal danger before the door.** 302 overworld entrance squares lead to a map holding hostile monsters, and 19 percent of them have a sign, magic mouth, or rune within three tiles. Grouping adjacent squares that share a destination gives 287 actual doors, of which **229 — 80 percent — have nothing warning you at all**. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is 229 doors long.
   - **Teach at the point of need, using the modalities that already exist.** Signs, marking runes, magic mouths, books, NPC ''@match'' dialogue, and ''knowledge_marker'' are all in the engine today and underused (map ''msg'' and region ''msg'' only surface on ''mapinfo'' and ''whereami'', so they are flavour rather than teaching). A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
   - **Give each dungeon a teaching room.** If a map's gimmick is spell-reflecting monsters, invisibility, or a timed gate, room one should demonstrate it somewhere survivable. This is a map-authoring convention, not code — worth writing into ''Info/mapguide''.
   - **Keep doing what the recent altar work does.** The last several commits added second altars to temples for multi-player friendliness. That is the article's "player diversity" principle applied without being told to — reducing contention so different player populations can use the same content. The same instinct should extend to chokepoints in quest maps.
@@ -843,7 +843,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
 
 **Tier 2 — map work, with a queue the scans already produce.**
 
-  - Sign the 244 unsigned overworld entrances into monster-bearing maps.
+  - Sign the 229 unsigned overworld doors into monster-bearing maps.
   - Review the 12 maps carrying invisible item-keyed trigger altars, starting with ''mlab/citydeclouds/cwdcguestofmarquis1''.
   - Fix the 142 maps that declare ''difficulty 1'' with hostile monsters on them, and the 4 dungeons that are flat at every depth.
   - Add a vestibule to the maps whose first hostile is within one or two tiles of the entry point.
