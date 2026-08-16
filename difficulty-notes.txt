@@ -10,13 +10,13 @@ It is written for linear single-player platformers made by studios with a publis
 
 Three sections, and each bullet in the first two has its own expanded section following it:
 
-  * **What applies** - the seven ideas that port, and what the map set and server source actually look like when you check them.
-  * **What does not apply cleanly** - three that do not, plus the local equivalent each one already has.
-  * **What Crossfire should actually adopt** - the six-item list from the original notes, now sequenced into tiers by what unblocks what.
+  * **What applies** — the seven ideas that port, and what the map set and server source actually look like when you check them.
+  * **What does not apply cleanly** — three that do not, plus the local equivalent each one already has.
+  * **What Crossfire should actually adopt** — the six-item list from the original notes, now sequenced into tiers by what unblocks what.
 
-The bullets are short and were written first. The expansions came from reading the server, the archetypes, and the maps, and they are where the numbers and the file references live. Where the two disagree, the expansion is right - two claims in the original bullets did not survive contact with the source, and both corrections are called out in the adopt section.
+The bullets are short and were written first. The expansions came from reading the server, the archetypes, and the maps, and they are where the numbers and the file references live. Where the two disagree, the expansion is right — three claims in the original bullets did not survive contact with the source, and each correction is called out where it belongs rather than quietly patched.
 
-**The short version.** Crossfire does not need new systems to address most of what this article describes. It needs the capability it already ships to be used, the mechanics it already has to be explained in-game, one paragraph of ''Info/mapguide'' amended, and - before any of the arguing about maps - one Python script that records where players die.
+**The short version.** Crossfire does not need new systems to address most of what this article describes. It needs the capability it already ships to be used, the mechanics it already has to be explained in-game, one paragraph of ''Info/mapguide'' amended, and — before any of the arguing about maps — one Python script that records where players die.
 
 ===== What applies =====
 
@@ -24,22 +24,22 @@ The bullets are short and were written first. The expansions came from reading t
 
 Going in, the expectation was that this would turn into a wishlist of engine features. It did not. In almost every case the capability already exists, ships today, and is sitting unused:
 
-  * Teaching objects - magic mouths, marking runes, ''knowledge_marker'' - are all in the engine. Three files in the entire map set use the last one.
+  * Teaching objects — magic mouths, marking runes, ''knowledge_marker'' — are all in the engine. Three files in the entire map set use the last one.
   * The server has a third help category for non-command topics, ''mischelp''. The directory does not exist and the lookup function does not search it.
   * Nineteen global plugin events fire today, dispatched from a directory convention, with a SQLite database already open. The two hooks nobody has written are the two the article most wants.
   * The quest format supports cross-quest conditions and parent chains. 24 ''setwhen'' blocks exist across 66 quests.
   * The death penalty is tunable from a config file, and 10 of the 11 gods already cure its worst effect for free.
   * The random map generator has a per-level difficulty ramp. It is set on 1 of 316 overworld entrances.
 
-So the gap between Crossfire and the article's advice is mostly unused capability and untaught mechanics - not missing systems. And in one case it is a rule in ''Info/mapguide'' telling authors to do the opposite of what the article recommends, which is a policy problem rather than a design one.
+So the gap between Crossfire and the article's advice is mostly unused capability and untaught mechanics — not missing systems. And in one case it is a rule in ''Info/mapguide'' telling authors to do the opposite of what the article recommends, which is a policy problem rather than a design one.
 
 ==== On the numbers ====
 
-Figures come from scanning the map set, the archetype tree, and the server source rather than from the wiki, and file and line references are given so they can be checked. Where a scan has a known bias, it is stated next to the number - several do, and the caveat is usually more useful than the figure.
+Figures come from scanning the map set, the archetype tree, and the server source rather than from the wiki, and file and line references are given so they can be checked. Where a scan has a known bias, it is stated next to the number — several do, and the caveat is usually more useful than the figure.
 
 ==== What all of it is missing ====
 
-Every measurement here is static - what an author declared, what objects a map contains, how far the first monster is from the door. None of it measures what a player actually experienced. That is what the monitoring section is for, and it is why that work sits at the top of the list of things to build.
+Every measurement here is static — what an author declared, what objects a map contains, how far the first monster is from the door. None of it measures what a player actually experienced. That is what the monitoring section is for, and it is why that work sits at the top of the list of things to build.
 
 ==== The list ====
 
@@ -49,7 +49,7 @@ Every measurement here is static - what an author declared, what objects a map c
 
 **"It is impossible to make a game for everyone."** Crossfire has implicitly targeted one archetype for 30 years: the player who reads external documentation and enjoys opaque systems. That is a legitimate choice, but it should be a //decision//, not an accident, and it should be stated so map authors design toward it consistently. Expanded below.
 
-**Don't punish failure with increased difficulty.** Crossfire's death penalty is exp loss plus stat depletion — the player who just failed is now measurably weaker facing the same content. This is the article's explicit "don't." It reads like an engine problem, but most of it is not - the numbers are already tunable in ''lib/config/settings'', and the depletion is curable by any player who knows how. Expanded below.
+**Don't punish failure with increased difficulty.** Crossfire's death penalty is exp loss plus stat depletion — the player who just failed is now measurably weaker facing the same content. This is the article's explicit "don't." It reads like an engine problem, but most of it is not — the numbers are already tunable in ''lib/config/settings'', and the depletion is curable by any player who knows how. Expanded below.
 
 **Don't hide mechanics as puzzle solutions.** Plenty of Crossfire maps require knowing something never taught anywhere in the game to progress. Expanded below.
 
@@ -61,7 +61,7 @@ Every measurement here is static - what an author declared, what objects a map c
 
 ==== What the saw actually asks for ====
 
-The shape is not a ramp. Each time the content introduces something new, intensity //drops//, then climbs past where it was before, and the next introduction drops it again. The dips are not mercy and they are not filler - they are the headroom in which the player learns the new thing without dying to the old thing at the same time. A ramp with no dips teaches nothing, because there is never a moment where the only new variable is the new variable.
+The shape is not a ramp. Each time the content introduces something new, intensity //drops//, then climbs past where it was before, and the next introduction drops it again. The dips are not mercy and they are not filler — they are the headroom in which the player learns the new thing without dying to the old thing at the same time. A ramp with no dips teaches nothing, because there is never a moment where the only new variable is the new variable.
 
 The bullet above has the scope right: Crossfire has no global curve and should not try to have one. But a five-level dungeon //is// a linear experience, and it is the unit where the saw applies.
 
@@ -69,43 +69,43 @@ The bullet above has the scope right: Crossfire has no global curve and should n
 
 The obvious place to look for an intended shape is the ''difficulty'' header. It does not hold one, for three separate reasons.
 
-**Almost every map declares a value, and most declare the same one.** 3,281 of 3,282 maps set ''difficulty'' explicitly. **1,896 of them - 58 percent - declare exactly 1.** That is not a judgement, it is a default that nobody changed.
+**Almost every map declares a value, and most declare the same one.** 3,281 of 3,282 maps set ''difficulty'' explicitly. **1,896 of them — 58 percent — declare exactly 1.** That is not a judgement, it is a default that nobody changed.
 
 **Declaring a value switches the server's own estimate off.** ''calculate_difficulty()'' in ''common/map.cpp'' opens with a short circuit: if the map declares anything non-zero, that value is returned unchanged and no calculation happens. A map full of dragons that says ''difficulty 1'' //is// difficulty 1 as far as the server is concerned. The function's own comment says human calculation is better than its guesswork, which is fair, but 1 is not a human calculation.
 
-**The declared numbers and the calculated ones are not even on the same scale.** The estimator caps at 25. **360 maps - 11 percent - declare above that ceiling**, topping out at ''scorn/misc/testing_area'' with 1000. Whatever authors think the field means, it is not what the function computes.
+**The declared numbers and the calculated ones are not even on the same scale.** The estimator caps at 25. **360 maps — 11 percent — declare above that ceiling**, topping out at ''scorn/misc/testing_area'' with 1000. Whatever authors think the field means, it is not what the function computes.
 
-And the field is load-bearing well beyond danger. Map difficulty feeds treasure quality in chests and containers, shop restocking, the experience awarded for skill identification, and how quickly a hidden player is revealed - ''server/apply.cpp'', ''server/c_misc.cpp:2321'', ''server/skill_util.cpp:718'', and ''server/player.cpp:4082''. That last pair is worth knowing: a map declaring 1 makes hiding easier and skill-ident exp lower, quite apart from what lives there.
+And the field is load-bearing well beyond danger. Map difficulty feeds treasure quality in chests and containers, shop restocking, the experience awarded for skill identification, and how quickly a hidden player is revealed — ''server/apply.cpp'', ''server/c_misc.cpp:2321'', ''server/skill_util.cpp:718'', and ''server/player.cpp:4082''. That last pair is worth knowing: a map declaring 1 makes hiding easier and skill-ident exp lower, quite apart from what lives there.
 
 NOTE: this is the trap in the difficulty audit proposed at the bottom of this page. ''wolfsburg/shops/transport.shoppe'' declares 110 and contains no monsters at all, which a monster-content audit would flag as a wild outlier. It is a shop, and there the number is setting stock quality. **The audit has to segment by map type before it compares anything**, or it will produce a long list of confident false positives.
 
 ==== Measuring the shape ====
 
-Declared difficulty is still the best available record of what an author //intended//, so it is worth asking what shape it traces through a dungeon. Building a map graph from exit objects, grouping by directory, filtering to groups of three or more linked maps where most maps contain monsters - which drops the guild halls, shop rows, and apartment blocks - and walking outward from whichever map is entered from outside the group:
+Declared difficulty is still the best available record of what an author //intended//, so it is worth asking what shape it traces through a dungeon. Building a map graph from exit objects, grouping by directory, filtering to groups of three or more linked maps where most maps contain monsters — which drops the guild halls, shop rows, and apartment blocks — and walking outward from whichever map is entered from outside the group:
 
   * **136 monster-bearing multi-map dungeons** qualify, a median of 5 maps each.
-  * **32 percent are flat** - the same declared difficulty at every depth, from the entrance to the bottom.
+  * **32 percent are flat** — the same declared difficulty at every depth, from the entrance to the bottom.
   * 68 percent vary with depth. Of those, **51 percent rise strictly**, never dipping once.
-  * The remaining **49 percent of graded dungeons contain a dip somewhere** - but reading them, the dips mostly land at the //end//, not after an introduction: ''euthville'' runs 15, 15, 15, 15, 15, 15, 18, 13, and ''darcap/castle'' runs 12, 1, 1, 1. That is the last level being softer than the one before it, which is inconsistency rather than pacing.
+  * The remaining **49 percent of graded dungeons contain a dip somewhere** — but reading them, the dips mostly land at the //end//, not after an introduction: ''euthville'' runs 15, 15, 15, 15, 15, 15, 18, 13, and ''darcap/castle'' runs 12, 1, 1, 1. That is the last level being softer than the one before it, which is inconsistency rather than pacing.
 
 So the honest summary is not "Crossfire has the wrong shape." It is that **a third of dungeons are a flat line, half the rest are a pure ramp, and the dips that do exist are not placed where a saw would put them.** Nothing in the map set reads as an author deliberately dropping intensity to make room for a new idea.
 
 The exceptions are worth naming, because they show it is achievable within the existing format. ''navar_city/mlab'' grades 47 linked maps across 15 distinct values from 1 to 90. ''quests/peterm/FireTemple'' runs 14 maps across 10 values from 8 to 60. ''brest/asyvan'', ''pup_land/s_f'', and ''sisters'' are all in the same territory.
 
-NOTE: three caveats on all of the above. This measures **declared** difficulty, which is author intent and not what a player feels - the death data from the monitoring section is what would measure the second. Using a directory as the boundary of a dungeon is a proxy that will merge some things and split others. And depth is breadth-first distance from whichever map is entered from outside, which is wrong for any dungeon with two entrances.
+NOTE: three caveats on all of the above. This measures **declared** difficulty, which is author intent and not what a player feels — the death data from the monitoring section is what would measure the second. Using a directory as the boundary of a dungeon is a proxy that will merge some things and split others. And depth is breadth-first distance from whichever map is entered from outside, which is wrong for any dungeon with two entrances.
 
 ==== What a saw would look like here ====
 
 The unit is the dungeon level, and the mechanism is monster budget rather than the header. Concretely, for a dungeon whose gimmick is spell-reflecting monsters:
 
-  * **Level 1** opens under the pressure of the previous peak - which for a fresh dungeon means low - and introduces the reflectors in isolation. This is the teaching room from the mechanic surface section, and it is also the first dip.
+  * **Level 1** opens under the pressure of the previous peak — which for a fresh dungeon means low — and introduces the reflectors in isolation. This is the teaching room from the mechanic surface section, and it is also the first dip.
   * **Level 2** rises: reflectors plus ordinary monsters, at a level where the player has to sequence their attacks.
-  * **Level 3** dips again to introduce the //next// idea - say, a monster that dispels - with the reflectors absent or thinned out.
+  * **Level 3** dips again to introduce the //next// idea — say, a monster that dispels — with the reflectors absent or thinned out.
   * **Level 4** combines both and exceeds level 2.
 
 The dips are cheap. They cost monster budget, not map count, and the budget freed on the dip levels pays for the peaks. This is the same argument as the pacing section, one scale up: there it was rooms within a map, here it is maps within a dungeon.
 
-The ''difficulty'' header should then be written to follow that shape rather than left at 1 - not because the number changes the monsters, but because it changes the treasure, and because an author who cannot write down the intended sequence probably does not have one.
+The ''difficulty'' header should then be written to follow that shape rather than left at 1 — not because the number changes the monsters, but because it changes the treasure, and because an author who cannot write down the intended sequence probably does not have one.
 
 ==== Conventions worth adding to Info/mapguide ====
 
@@ -113,11 +113,11 @@ The ''difficulty'' header should then be written to follow that shape rather tha
   - Never ship ''difficulty 1'' on a map with monsters. It is the default, it suppresses the server's own estimate, and it sets treasure to the floor.
   - Put the dip where something new is introduced, and pay for it out of monster budget rather than map count.
   - Do not soften the last level. Several dungeons currently end easier than they peaked, which reads as running out of steam.
-  - Where the field is being used for shop stock or another economy purpose rather than danger, say so in the map's ''comment'' so an audit can skip it.
+  - Where the field is being used for shop stock or another economy purpose rather than danger, say so in the map's ''maplore'' block so an audit can skip it. NOTE: maps have no ''comment'' field, but ''maplore'' is parsed, saved, and never shown to a player, which makes it the author-only note field. 44 maps use it.
 
 ==== Making it measurable ====
 
-The graph scan behind the numbers above is small - resolve exit ''slaying'' paths, group by directory, walk outward from the entrance - and it produces a per-dungeon difficulty sequence that an author can read at a glance. Run against the whole set it gives three work queues: the flat dungeons, the maps declaring 1 with monsters on them, and the dungeons that end softer than they peaked.
+The graph scan behind the numbers above is small — resolve exit ''slaying'' paths, group by directory, walk outward from the entrance — and it produces a per-dungeon difficulty sequence that an author can read at a glance. Run against the whole set it gives three work queues: the flat dungeons, the maps declaring 1 with monsters on them, and the dungeons that end softer than they peaked. NOTE: ''utils/maps-to-dot'' in the server tree already builds the exit graph half of this, so the work is a difficulty overlay on an existing tool rather than a new one.
 
 Joined against the death data from the monitoring section, it answers the question this whole page keeps circling: does declared difficulty have anything to do with where players actually die?
 
@@ -127,7 +127,7 @@ Two different things get called "too hard" and only one of them is a difficulty 
 
 Split the surface three ways, because who can fix it differs for each.
 
-==== 1. Local mechanics - the map that uses it should teach it ====
+==== 1. Local mechanics — the map that uses it should teach it ====
 
 These are specific to the content in front of the player, so the map introducing the problem is the map that owes them the explanation.
 
@@ -141,15 +141,15 @@ These are specific to the content in front of the player, so the map introducing
 
 **Quest-item handling.** ''check_inv'' gates keyed on ''slaying'', marking runes, and NPC ''@match'' keywords that cannot be guessed from anything visible in the map.
 
-==== 2. Character-wide mechanics - start areas, temples, and guild NPCs ====
+==== 2. Character-wide mechanics — start areas, temples, and guild NPCs ====
 
 These are not specific to any one dungeon, so teaching them in every dungeon is noise. They belong once, in a place the player passes through early, and again at the point of first contact.
 
 **Skills and literacy** (you need the skill object before the action works, and books silently refuse readers without literacy), **praying and gods** (converting, grace regeneration, what a god actually grants), **spell paths** (attuned, repelled, and denied, including paths your own god denies), **item power** (the level-relative cap on worn equipment), **curses and damnation**, **alchemy and weapon improvement** (both are multi-step sequences with irreversible failure states), and **encumbrance** (armour weight costing you speed and spell point regeneration).
 
-==== 3. Engine-side - not a map author's problem ====
+==== 3. Engine-side — not a map author's problem ====
 
-The wording of refusal messages and the general absence of a "that did nothing, and here is why" feedback line. Worth listing separately so nobody tries to paper over them with signs. The death penalty looks like it belongs here too, but most of it does not - see the death penalty section below.
+The wording of refusal messages and the general absence of a "that did nothing, and here is why" feedback line. Worth listing separately so nobody tries to paper over them with signs. The death penalty looks like it belongs here too, but most of it does not — see the death penalty section below.
 
 ==== What the engine already hands a map author ====
 
@@ -165,7 +165,7 @@ The modalities are all there, but they are not equal, and two of the ones common
 
 **NPC ''@match'' dialogue** — the richest option and the only one that rewards a player for asking the right question. ''scorn/misc/beginners_entry'' is the model: several synonyms per ''@match'', ''@question'' and ''@reply'' lines advertising the follow-ups, and a ''@match *'' fallback. The failure mode is the player who never types anything, so dialogue supplements a lesson, it does not carry one.
 
-**Map ''msg'' and region ''msg''** — correcting the list further down: neither displays automatically. ''server/c_misc.cpp'' prints the map's ''msg'' only from ''mapinfo'' and the region's only from ''whereami''. They are flavour for players who already poke at commands, not a teaching channel for someone who does not know the commands exist.
+**Map ''msg'' and region ''msg''** — worth stating plainly, because both are commonly cited as teaching channels and neither displays automatically. ''server/c_misc.cpp'' prints the map's ''msg'' only from ''mapinfo'' and the region's only from ''whereami''. They are flavour for players who already poke at commands, not a teaching channel for someone who does not know the commands exist.
 
 **''knowledge_marker''** — the one that should be everywhere and is not. Put ''knowledge_marker monster:fire_elemental'' on a sign, rune, or book and reading it permanently adds that monster to the player's ''knowledge'' list, complete with the description the server generates from the archetype (attacktypes, resistances, abilities). Valid prefixes are ''monster:'', ''god:'', ''alchemy:'', and ''message:'', multiple entries separated by ''/''. Grep the entire map set and three files use it — ''start/newbieshouse'', ''quests/peterm/FireTemple/FourthFloor'', and one python command. That is the largest piece of unused teaching machinery in the game, and it is the only one whose lesson survives the player logging out.
 
@@ -246,7 +246,7 @@ end
 
 ==== Making it measurable ====
 
-This list has the same problem as the rest of the article — it is all taste until something counts it. The counting is cheap here: teaching objects are archetypes, so a scan for ''magic_mouth'', ''rune_mark'', ''sign'', and ''knowledge_marker'' per map is the same kind of pass [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already makes for monsters and treasure. Cross that count against the map's ''difficulty'' and its monster list and the output is a short list of maps that are hard and say nothing, which is the actual thing worth fixing.
+This list has the same problem as the rest of these notes — it is all taste until something counts it. The counting is cheap here: teaching objects are archetypes, so a scan for ''magic_mouth'', ''rune_mark'', ''sign'', and ''knowledge_marker'' per map is the same kind of pass [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already makes for monsters and treasure. Cross that count against the map's ''difficulty'' and its monster list and the output is a short list of maps that are hard and say nothing, which is the actual thing worth fixing. NOTE: a bare object count flatters the map set badly — see the hidden-mechanics section below for why ''bookshelf'' and "Dungeon Master's Lounge" both score as teaching.
 
 ===== Who Crossfire is actually for, expanded =====
 
@@ -258,13 +258,13 @@ The trap is assuming the only alternative is to dumb the game down. It is not, a
 
 The structural answer is layering: information the curious player can pull, rather than a lecture pushed at everybody. That costs the veteran nothing, because a veteran does not read the sign.
 
-**Make the depth opt-in, not mandatory.** An NPC with ''@match'' dialogue is the cleanest version of this in the engine. The player who wants to be told can ask; the player who wants to work it out walks past and never sees the text. The same map serves both, which is the closest anybody gets to beating the article's rule. ''scorn/misc/beginners_entry'' already does this - the ''@question'' and ''@reply'' lines advertise what is askable, so a curious player can pull three layers deep and everyone else can ignore it.
+**Make the depth opt-in, not mandatory.** An NPC with ''@match'' dialogue is the cleanest version of this in the engine. The player who wants to be told can ask; the player who wants to work it out walks past and never sees the text. The same map serves both, which is the closest anybody gets to beating the article's rule. ''scorn/misc/beginners_entry'' already does this — the ''@question'' and ''@reply'' lines advertise what is askable, so a curious player can pull three layers deep and everyone else can ignore it.
 
-**State the target, not the answer.** A sign at a dungeon entrance reading "the guard captain lost six men in here, all of them better armed than you" tells a level 5 character to come back later without revealing a single mechanic. Danger signalling and mechanic teaching are separate jobs, and the first one is uncontroversial - nobody's sense of discovery is ruined by knowing a dungeon is deadly.
+**State the target, not the answer.** A sign at a dungeon entrance reading "the guard captain lost six men in here, all of them better armed than you" tells a level 5 character to come back later without revealing a single mechanic. Danger signalling and mechanic teaching are separate jobs, and the first one is uncontroversial — nobody's sense of discovery is ruined by knowing a dungeon is deadly.
 
 **Two doors into the same content.** Where a dungeon has a punishing route and a slower safe one, say so at the fork and let the player choose their own difficulty. This is player-authored difficulty selection with no engine support required, and it does not fragment the playerbase across separate content the way difficulty settings would.
 
-**Let the game keep the notes.** ''knowledge_marker'' is the in-game replacement for a spoiler file. The player still has to find the book, kill the thing, or ask the right NPC - the discovery loop is intact - but what they discover is recorded in-game instead of in a browser tab. This is the single most important idea in these notes: the goal is not to remove the spoiler file, it is to move it inside the game where it can be earned.
+**Let the game keep the notes.** ''knowledge_marker'' is the in-game replacement for a spoiler file. The player still has to find the book, kill the thing, or ask the right NPC — the discovery loop is intact — but what they discover is recorded in-game instead of in a browser tab. This is the single most important idea in these notes: the goal is not to remove the spoiler file, it is to move it inside the game where it can be earned.
 
 **Gate the consequence, not the information.** A teaching room where the gimmick cannot kill you, followed by the real encounter where it can. The lesson stays discovered rather than told, and the player who already knows loses ten seconds walking through room one.
 
@@ -274,27 +274,27 @@ The structural answer is layering: information the curious player can pull, rath
 
 Crossfire is not unusual here, and the useful part is what each of these did about it.
 
-**NetHack.** The archetype, and the reason "spoiler file" is a genre term. In-game there is ''#help'', an oracle selling vague hints, and not much else; the actual manual is a community-maintained pile of text files. Its community treats reading them as part of playing rather than as a failure, which is the same position Crossfire occupies by default. Worth knowing that this is a defensible end state - it just should be chosen.
+**NetHack.** The archetype, and the reason "spoiler file" is a genre term. In-game there is ''#help'', an oracle selling vague hints, and not much else; the actual manual is a community-maintained pile of text files. Its community treats reading them as part of playing rather than as a failure, which is the same position Crossfire occupies by default. Worth knowing that this is a defensible end state — it just should be chosen.
 
 **Dungeon Crawl Stone Soup.** The instructive one. It forked from Linley's Dungeon Crawl and its design documents treat spoiler-dependence as a bug: content whose correct play required knowing something the game never showed you got reworked or removed, and in-game monster and item descriptions are detailed enough that examining a thing tells you how it fights. Crawl did not get easier. It got legible. That distinction is the whole argument, and Crawl is the closest thing to a proof that a roguelike community can make this decision without losing its identity.
 
-**Dwarf Fortress.** The extreme case for over a decade - enormous simulation, an interface that told you almost nothing, a wiki that was mandatory equipment. The 2022 commercial release added a tutorial and rebuilt the interface without simplifying the simulation underneath it. Depth and opacity came apart cleanly, which is the counterexample to hand anyone who argues that explaining Crossfire would ruin it.
+**Dwarf Fortress.** The extreme case for over a decade — enormous simulation, an interface that told you almost nothing, a wiki that was mandatory equipment. The 2022 commercial release added a tutorial and rebuilt the interface without simplifying the simulation underneath it. Depth and opacity came apart cleanly, which is the counterexample to hand anyone who argues that explaining Crossfire would ruin it.
 
 **Caves of Qud.** Built modern with the teaching inside the game: item, mutation, and effect descriptions state their actual mechanics, and the setting is delivered as in-world text rather than as an out-of-game manual. Still deeply strange, still punishing. Roughly the target state for a Crossfire that keeps its character.
 
-**EVE Online.** The closest structural match - persistent, shared economy, no way to scale difficulty per player without breaking fairness, which is the same corner the article's "magic sauce" section puts Crossfire in. Also the cautionary tale: it never solved the out-of-game problem, and third-party tools and spreadsheets became part of the effective client. Its partial answers were tutorial chains and career agents, which is to say teaching content placed inside the world.
+**EVE Online.** The closest structural match — persistent, shared economy, no way to scale difficulty per player without breaking fairness, which is the same corner the article's "magic sauce" section puts Crossfire in. Also the cautionary tale: it never solved the out-of-game problem, and third-party tools and spreadsheets became part of the effective client. Its partial answers were tutorial chains and career agents, which is to say teaching content placed inside the world.
 
-**Angband and ADOM** are the near relatives - same lineage, same reliance on external spoiler files, same "you had to know" moments - and **Path of Exile** is the endpoint worth avoiding, where an external build planner is not optional and everyone has quietly agreed that the game ships incomplete.
+**Angband and ADOM** are the near relatives — same lineage, same reliance on external spoiler files, same "you had to know" moments — and **Path of Exile** is the endpoint worth avoiding, where an external build planner is not optional and everyone has quietly agreed that the game ships incomplete.
 
 ==== Where a player has to go today ====
 
 For completeness, the current reading list, none of which is reachable from inside the game:
 
-  * [[https://crossfire.real-time.com/|crossfire.real-time.com]] - the project site: downloads, mailing list archives, generated code documentation.
-  * [[https://wiki.cross-fire.org/|wiki.cross-fire.org]] - the DokuWiki wiki, and the de facto manual.
-  * [[https://forum.cross-fire.org|forum.cross-fire.org]] - the forum.
-  * [[https://www.crossfireatlas.net/|crossfireatlas.net]] - the Crossfire Atlas, for rendered world maps.
-  * [[https://sourceforge.net/projects/crossfire/|SourceForge]] - releases, bug tracker, feature requests, patches.
+  * [[https://crossfire.real-time.com/|crossfire.real-time.com]] — the project site: downloads, mailing list archives, generated code documentation.
+  * [[https://wiki.cross-fire.org/|wiki.cross-fire.org]] — the DokuWiki wiki, and the de facto manual.
+  * [[https://forum.cross-fire.org|forum.cross-fire.org]] — the forum.
+  * [[https://www.crossfireatlas.net/|crossfireatlas.net]] — the Crossfire Atlas, for rendered world maps.
+  * [[https://sourceforge.net/projects/crossfire/|SourceForge]] — releases, bug tracker, feature requests, patches.
   * IRC ''#crossfire'' on irc.libera.chat (web portal at [[https://crossfire.real-time.com/irc/|crossfire.real-time.com/irc]]) and Discord at [[https://crossfire.real-time.com/discord|crossfire.real-time.com/discord]].
   * The ''crossfire'' mailing list at [[http://mailman.metalforge.org/mailman/listinfo/crossfire|mailman.metalforge.org]].
   * Shipped in the server source and read by almost nobody: ''doc/survival-guide.txt'' (178 lines), ''doc/skills.txt'' (443 lines), ''doc/runes-guide.txt'', ''doc/spoiler'', and the LaTeX Playbook in ''doc/playbook''.
@@ -305,13 +305,13 @@ That last line is the one worth staring at. A survival guide and a 443-line skil
 
 The gap is smaller than it looks, because most of the machinery is already built and idle.
 
-**The topical help slot exists and is empty.** ''server/c_misc.cpp'' has three help categories: commands, wiz commands, and //misc//. The misc branch reads ''$datadir/mischelp'' - and that directory does not exist in the tree. ''opendir'' fails, the function returns silently, and ''help topics'' prints an empty "Misc help:" line. The engine has a purpose-built home for exactly the documentation these notes say is missing, and nobody has ever put anything in it.
+**The topical help slot exists and is empty.** ''server/c_misc.cpp'' has three help categories: commands, wiz commands, and //misc//. The misc branch reads ''$datadir/mischelp'' — and that directory does not exist in the tree. ''opendir'' fails, the function returns silently, and ''help topics'' prints an empty "Misc help:" line. The engine has a purpose-built home for exactly the documentation these notes say is missing, and nobody has ever put anything in it.
 
 **And it is not wired up anyway.** ''find_help_file()'' searches ''wizhelp'' and ''help'' only. Drop a file into ''mischelp'' today and it would be //listed// under "Misc help" and still be unreadable, because ''help <topic>'' would not find it. Two more ''find_help_file_in()'' calls fixes that. It is the smallest engine change on this list and it unblocks all of the rest.
 
-**Of 96 help topics, all but about three document the interface.** Most of ''lib/help'' covers keystrokes and syntax: ''apply'', ''bind'', ''pickup'', ''shoottype''. The exceptions are ''death.en'' and ''spells.en'', with ''traps.en'' a partial third, and ''death.en'' in particular is well written - which proves the project can produce this material when somebody sits down to do it. There is still no ''itempower'', no ''paths'', no ''praying'', no ''resistances'', no ''curse'', no ''literacy'', no ''encumbrance'', and no ''alchemy''. A player can learn every keystroke in the game and still not be told that armour weight costs them spell point regeneration. The problem is not that nobody can write these; it is that two got written and the effort stopped.
+**Of 96 help topics, all but about three document the interface.** Most of ''lib/help'' covers keystrokes and syntax: ''apply'', ''bind'', ''pickup'', ''shoottype''. The exceptions are ''death.en'' and ''spells.en'', with ''traps.en'' a partial third, and ''death.en'' in particular is well written — which proves the project can produce this material when somebody sits down to do it. There is still no ''itempower'', no ''paths'', no ''praying'', no ''resistances'', no ''curse'', no ''literacy'', no ''encumbrance'', and no ''alchemy''. A player can learn every keystroke in the game and still not be told that armour weight costs them spell point regeneration. The problem is not that nobody can write these; it is that two got written and the effort stopped.
 
-**The starting help page is eight lines.** ''lib/def_help'' explains how to use ''help'' and how to file a bug. That is the game's front door for a new player, and it points at a topic list that is entirely commands.
+**The starting help page is eight lines.** ''lib/def_help'' explains how to use ''help'' and how to file a bug. That is the game's front door for a new player, and it points at a topic list that is almost entirely commands.
 
 **Nobody finds out ''knowledge'' exists.** ''server/knowledge.cpp'' prints a one-time hint about the ''knowledge'' command the first time a player is granted any knowledge at all. With three files in the map set using ''knowledge_marker'', most players are never granted any, so they never see the hint, so the feature is invisible. It is circular, and the map side is what breaks the loop.
 
@@ -321,7 +321,7 @@ Ordered by cost, the work looks like this:
 
   - Add the two ''find_help_file_in("mischelp", ...)'' calls so topical help resolves at all.
   - Create ''lib/mischelp'' and convert ''doc/survival-guide.txt'', ''doc/skills.txt'', and ''doc/runes-guide.txt'' into topic files. The text exists; this is editing, not writing.
-  - Write the missing mechanic topics - item power, spell paths, praying and gods, resistances, curses, literacy, encumbrance, alchemy, weapon improvement - following the existing ''.en'' and ''.fr'' naming convention.
+  - Write the missing mechanic topics — item power, spell paths, praying and gods, resistances, curses, literacy, encumbrance, alchemy, weapon improvement — following the existing ''.en'' and ''.fr'' naming convention.
   - Rewrite ''lib/def_help'' to point a new player at the mechanic topics first and the command list second.
   - Start attaching ''knowledge_marker'' to the signs and books that already describe monsters, gods, and recipes, so the knowledge system stops being invisible.
   - Give new characters one readable in-game item that says the ''help'' and ''knowledge'' commands exist.
@@ -332,7 +332,7 @@ None of that removes a single system, changes a single monster, or makes the gam
 
 ==== What actually happens when you die ====
 
-The one-line summary above - exp loss plus stat depletion - is right but incomplete, and the incomplete part is where the fixes live. From ''kill_player_not_permadeath()'' in ''server/player.cpp:3599'', in order:
+The one-line summary above — exp loss plus stat depletion — is right but incomplete, and the incomplete part is where the fixes live. From ''kill_player_not_permadeath()'' in ''server/player.cpp:3599'', in order:
 
   - One random stat of seven is depleted. With the default ''stat_loss_on_death false'' this is a recoverable ''depletion'' object in your inventory, not permanent stat loss.
   - A gravestone is placed on the square where you died, naming you, your title, and your killer.
@@ -343,15 +343,15 @@ The one-line summary above - exp loss plus stat depletion - is right but incompl
   - You are teleported to your last savebed, unbraced, with pickup inhibited, and saved.
   - If a spell effect is sitting on your savebed square, you get a 50-tick immunity force so you cannot be spawn-killed.
 
-Two things stand out. **No items are lost** - your gear comes with you, which is already more merciful than most of the genre. And death partially //heals// you: full hp, sp, grace, food, and every status effect cleared. The engine is not as punitive as its reputation, and saying so makes the criticism of what remains more credible rather than less.
+Two things stand out. **No items are lost** — your gear comes with you, which is already more merciful than most of the genre. And death partially //heals// you: full hp, sp, grace, food, and every status effect cleared. The engine is not as punitive as its reputation, and saying so makes the criticism of what remains more credible rather than less.
 
 The exp penalty itself, from ''apply_death_exp_penalty()'' in ''common/living.cpp:2244'', is the lesser of three numbers, computed **per skill**: ''death_penalty_percentage'' of that skill's exp, the exp equivalent of ''death_penalty_levels'' levels, or half of your non-permanent exp. Defaults in ''lib/config/settings'' are 20 percent, 3 levels, and ''permanent_experience_percentage 50''. So on a default server you cannot lose more than a quarter of your total exp no matter how badly things go, and half of it can never be lost at all.
 
 The per-skill part is the ugly bit. Every skill in your inventory takes the hit, including the ten you were not using when you died. A character who dies while meleeing loses literacy exp, bargaining exp, and praying exp along with it.
 
-**The depletion is curable and most players do not know how.** ''remove_depletion()'' is reachable three ways: a potion of life, the restoration spell, or praying at your god's altar. Ten of the game's eleven gods grant ''god_remove_depletion'' at ''chance 50'' with no level gate - Gnarg, Lythander, Mostrai, Valkyrie, Gaea, Ixalovh, Ruggilli, Sorig, Gorokh, and Valriel. The only holdout is Devourers, which is at least thematically honest. Praying at your own altar long enough is free and fixes everything.
+**The depletion is curable and most players do not know how.** ''remove_depletion()'' is reachable three ways: a potion of life, the restoration spell, or praying at your god's altar. Ten of the game's eleven gods grant ''god_remove_depletion'' at ''chance 50'' with no level gate — Gnarg, Lythander, Mostrai, Valkyrie, Gaea, Ixalovh, Ruggilli, Sorig, Gorokh, and Valriel. The only holdout is Devourers, which is at least thematically honest. Praying at your own altar long enough is free and fixes everything.
 
-That reframes the section. The death penalty is not really a difficulty penalty. It is a penalty for not having read the wiki - a player who knows about praying pays nothing but time, and a player who does not stays weakened indefinitely and concludes the game is punishing them. Recoverable depletion that the player cannot discover how to cure is functionally identical to permanent stat loss: same outcome, worse feeling, and fixable with a sign. It is the mechanic surface problem wearing a different hat.
+That reframes the section. The death penalty is not really a difficulty penalty. It is a penalty for not having read the wiki — a player who knows about praying pays nothing but time, and a player who does not stays weakened indefinitely and concludes the game is punishing them. Recoverable depletion that the player cannot discover how to cure is functionally identical to permanent stat loss: same outcome, worse feeling, and fixable with a sign. It is the mechanic surface problem wearing a different hat.
 
 It also helps to separate three things that get discussed as one. At death the numbers go down, you are weakened until you cure it, and you have to walk back. Only the first is the article's "increased difficulty" problem. The second is a teaching problem and the third is a map layout problem. They have different owners and different fixes, and lumping them together is why this conversation never lands.
 
@@ -359,28 +359,28 @@ It also helps to separate three things that get discussed as one. At death the n
 
 The penalty is already tunable in ''lib/config/settings'' without touching a line of C++. A server admin who thinks death hurts too much can act today:
 
-  * ''permanent_experience_percentage'' (default 50) - raise it and less exp is ever at risk. At 100 the exp penalty disappears entirely.
-  * ''death_penalty_percentage'' (default 20) and ''death_penalty_levels'' (default 3) - the two caps on a single death's exp loss. Lower either.
-  * ''stat_loss_on_death'' (default false) - already set to the merciful option, giving recoverable depletion rather than permanent stat loss. Worth knowing it exists, because true is much harsher.
-  * ''balanced_stat_loss'' (default false) - scales stat loss by level, gentler on low-level characters and harsher on high-level ones. Arguably the better setting for a game that wants new players to survive their first week, and the article's argument supports turning it on.
+  * ''permanent_experience_percentage'' (default 50) — raise it and less exp is ever at risk. At 100 the exp penalty disappears entirely.
+  * ''death_penalty_percentage'' (default 20) and ''death_penalty_levels'' (default 3) — the two caps on a single death's exp loss. Lower either.
+  * ''stat_loss_on_death'' (default false) — already set to the merciful option, giving recoverable depletion rather than permanent stat loss. Worth knowing it exists, because true is much harsher.
+  * ''balanced_stat_loss'' (default false) — scales stat loss by level, gentler on low-level characters and harsher on high-level ones. Arguably the better setting for a game that wants new players to survive their first week, and the article's argument supports turning it on.
 
 NOTE: none of this is a map or code change. A public test server could run softened values for a season and compare retention, which is the monitoring point applied to the one variable that is already adjustable.
 
 ==== No code changes: content and maps ====
 
-**Teach the cure at the point of pain.** A depleted player is standing at their savebed, which is in an inn or an apartment, which is a map somebody owns. A sign there naming the three cures - potion of life, restoration, praying at your god's altar - reaches every player at the exact moment the information is worth something. ''start/newbieshouse'' already has this text on a sign; it exists in precisely one place in the game.
+**Teach the cure at the point of pain.** A depleted player is standing at their savebed, which is in an inn or an apartment, which is a map somebody owns. A sign there naming the three cures — potion of life, restoration, praying at your god's altar — reaches every player at the exact moment the information is worth something. ''start/newbieshouse'' already has this text on a sign; it exists in precisely one place in the game.
 
 **Put the potions where the deaths are.** Potions of life are tiered by level: minor for under 5 (value 500), medium for under 30 (3000), major for under 50 (10000), supreme for under 130 (20000). A level 4 character who dies needs a 500-value potion, which is affordable, and has no idea it exists. Stocking them visibly in temple and healer shops near starting content, with a sign, costs nothing.
 
-**Say it in the temples.** Every temple map with an altar is a place where the cure is free. An NPC or sign in each of the ten temples whose god grants restoration, stating plainly that praying here long enough will restore stats lost to death, would close most of the gap on its own. It also gives the temples a reason to exist for non-priests.
+**Say it in the temples.** Every temple map with an altar is a place where the cure is free. An NPC or sign in the temples of the ten gods who grant restoration, stating plainly that praying here long enough will restore stats lost to death, would close most of the gap on its own. It also gives the temples a reason to exist for non-priests.
 
 **Shorten the walk.** 155 maps in the set contain a ''bed_save'', concentrated in cities. The pain of death for an experienced player is not the exp, which regenerates, it is the trip back. Inns or camps with savebeds near major dungeon clusters are a pure map-side fix and need no permission from anybody.
 
-**Use the gravestone.** It is already placed on the exact square where the player died, with the killer's name on it. Map authors can lean on that as a landmark - a returning player can find where they died. It is also, incidentally, the closest thing Crossfire already has to death-location tracking, just rendered as an object instead of a log line.
+**Use the gravestone.** It is already placed on the exact square where the player died, with the killer's name on it. Map authors can lean on that as a landmark — a returning player can find where they died. It is also, incidentally, the closest thing Crossfire already has to death-location tracking, just rendered as an object instead of a log line.
 
 ==== No code changes: data files ====
 
-''lib/help/death.en'' already exists and is genuinely good - it explains savebed transport, exp loss, depletion, the potion tiers, where to buy them (House of Healing in Scorn), and praying at your cult's altar. Somebody wrote the right document years ago.
+''lib/help/death.en'' already exists and is genuinely good — it explains savebed transport, exp loss, depletion, the potion tiers, where to buy them (House of Healing in Scorn), and praying at your cult's altar. Somebody wrote the right document years ago.
 
 The problem is discovery. It sits in ''lib/help'' among 96 files that are otherwise almost entirely command references, and reaching it requires typing ''help death'', which requires already suspecting that a topic named "death" exists. Fixes that are text edits, not code:
 
@@ -397,7 +397,7 @@ Ordered roughly by cost. The first two are almost free and worth doing regardles
 
 The death sequence ends with ''draw_ext_info(... "YOU HAVE DIED.")'' and nothing else. The player is not told how much exp they lost, which skills lost it, which stat was depleted, or that the depletion is curable. Every one of those numbers is already computed a few lines earlier.
 
-**Change:** have ''apply_death_exp_penalty()'' return a summary and print it with the death message - total exp lost, the worst-hit skill, the depleted stat by name, and a one-line pointer to ''help death''. Roughly 30 lines across ''common/living.cpp'' and ''server/player.cpp''. **Risk:** none, it is pure output with no rules change.
+**Change:** have ''apply_death_exp_penalty()'' return a summary and print it with the death message — total exp lost, the worst-hit skill, the depleted stat by name, and a one-line pointer to ''help death''. Roughly 30 lines across ''common/living.cpp'' and ''server/player.cpp''. **Risk:** none, it is pure output with no rules change.
 
 This is the highest value-to-effort item on the list. Most of the perceived cruelty of Crossfire death is that it happens silently. Going further, a death message that named the attacktype that finished you would teach most of the resistance system over a few characters.
 
@@ -407,9 +407,9 @@ This is the highest value-to-effort item on the list. Most of the perceived crue
 
 **Change:** add the loss figures to the gravestone ''msg''. Ten lines, and it makes the death location self-documenting for the player who walks back. **Risk:** none.
 
-=== Log deaths in a machine-readable form ===
+=== Log deaths — listed here, but not actually a code change ===
 
-The enabling change for the death-location aggregation further down this page. It is listed here because ''kill_player()'' is where the data is, but it belongs in this section only as a fallback - **this needs no C++ at all**, and the monitoring section below explains why. ''EVENT_PLAYER_DEATH'' already fires from ''kill_player()'' before the player is moved to their savebed, so a Python global event script sees the death location directly.
+The enabling change for the death-location aggregation further down this page. It appears in this list because ''kill_player()'' is where the data is, and it stays here only as a fallback — **this needs no C++ at all**, and the monitoring section below explains why. ''EVENT_PLAYER_DEATH'' already fires from ''kill_player()'' before the player is moved to their savebed, so a Python global event script sees the death location directly.
 
 **Change:** one record per death with map path, x, y, player level, killer name, and exp lost. Do it as a plugin script first; only touch the C++ if the exp figure turns out to be unreachable from Python. **Risk:** disk growth and privacy on a public server; log rotation and player-name hashing handle both.
 
@@ -419,7 +419,7 @@ Everything the monitoring section wants falls out of this, and it makes every ot
 
 The per-skill loop in ''apply_death_exp_penalty()'' hits every skill with exp. Dying to a monster should not cost you bargaining progress.
 
-**Change:** a new setting, ''death_penalty_skills'', with values ''all'' (current behaviour, the default) or ''used'', where ''used'' restricts the penalty to the skill applied at time of death plus the total-exp hit. **Risk:** low, and gated behind a setting that defaults to today's behaviour. Needs a decision on which skill counts when a player dies to a trap or to poison with no skill applied - falling back to the total-exp hit alone is fine.
+**Change:** a new setting, ''death_penalty_skills'', with values ''all'' (current behaviour, the default) or ''used'', where ''used'' restricts the penalty to the skill applied at time of death plus the total-exp hit. **Risk:** low, and gated behind a setting that defaults to today's behaviour. Needs a decision on which skill counts when a player dies to a trap or to poison with no skill applied — falling back to the total-exp hit alone is fine.
 
 === A floor for low-level characters ===
 
@@ -431,17 +431,17 @@ The per-skill loop in ''apply_death_exp_penalty()'' hits every skill with exp. D
 
 The classic answer to this problem in the wider genre, and Crossfire is one object away from it. The gravestone already exists, already sits on the square where you died, and is already named after you.
 
-**Change:** stash the lost exp on the gravestone at creation. A player who returns and applies their own gravestone recovers some fraction of it - half is the conventional number - and the stone crumbles. Non-owners get nothing, and expiry is automatic because the stone goes with the map reset.
+**Change:** stash the lost exp on the gravestone at creation. A player who returns and applies their own gravestone recovers some fraction of it — half is the conventional number — and the stone crumbles. Non-owners get nothing, and expiry is automatic because the stone goes with the map reset.
 
 This converts the penalty from a tax into content. The player who died gets a reason to go back in with the same monsters still there, which is exactly the backward callback the article likes, and it self-balances: recovering the exp means surviving the thing that killed you.
 
-**Risk:** the real one. In a shared-economy game, exp recovery has to be owner-locked or it becomes a trade good, and a player who dies repeatedly in one room should not stack ten stones. Cap it at one recoverable stone per player, replace on new death, and make the fraction a setting. **Effort:** moderate - a new apply handler for the gravestone plus owner tracking. This is the one to prototype on a test server rather than commit to.
+**Risk:** the real one. In a shared-economy game, exp recovery has to be owner-locked or it becomes a trade good, and a player who dies repeatedly in one room should not stack ten stones. Cap it at one recoverable stone per player, replace on new death, and make the fraction a setting. **Effort:** moderate — a new apply handler for the gravestone plus owner tracking. This is the one to prototype on a test server rather than commit to.
 
 === Depletion decay ===
 
 **Change:** an optional setting that removes one point of depletion per N hours of play time, so a player who never learns about praying is not permanently weakened.
 
-**Risk:** it undercuts the potion economy and the temples, which is a real cost. Better to fix the teaching than route around it, and this is listed mainly to argue against it - if the information problem is solved, depletion stops being a trap and this becomes unnecessary.
+**Risk:** it undercuts the potion economy and the temples, which is a real cost. Better to fix the teaching than route around it, and this is listed mainly to argue against it — if the information problem is solved, depletion stops being a trap and this becomes unnecessary.
 
 === Make help text reflect the running server ===
 
@@ -451,7 +451,7 @@ This converts the penalty from a tax into content. The player who died gets a re
 
 ==== Before tuning anything ====
 
-Every number in the configuration section is a knob somebody can turn on opinion. The death log is 20 lines and it is what turns this into evidence - same conclusion as everywhere else on this page.
+Every number in the configuration section is a knob somebody can turn on opinion. The death log is one Python script and it is what turns this into evidence — same conclusion as everywhere else on this page.
 
 And watch the multiplayer angle. Any change here interacts with the shared economy: soul recovery is tradeable if you are careless, depletion decay devalues potions of life, and a lighter penalty changes the risk calculus for high-level players farming low-level content. None of these is a blocker, but each needs the party and economy case thought through before it ships.
 
@@ -461,14 +461,14 @@ And watch the multiplayer angle. Any change here interacts with the shared econo
 
 There is a clean test for this and it is worth stating before the examples. A **puzzle** asks the player to combine things the game has shown them. A **lockout** asks them to already know something the game never showed them anywhere. Both feel identical from the author's chair, because the author knows the answer. They are completely different from the player's side: one is solvable by thinking harder, the other is solvable only by alt-tabbing.
 
-The test is a single question - //where in the game could a player have learned this?// If the honest answer is "another map, and nothing points there" or "the wiki" or "you would have to try it", it is a lockout. Note that the answer does not have to be on the same map. A rumour in a tavern three towns over is a legitimate answer, as long as something connects the two.
+The test is a single question — //where in the game could a player have learned this?// If the honest answer is "another map, and nothing points there" or "the wiki" or "you would have to try it", it is a lockout. Note that the answer does not have to be on the same map. A rumour in a tavern three towns over is a legitimate answer, as long as something connects the two.
 
 ==== How much of this is there ====
 
 The gating mechanisms are ''check_inv'', ''altar_trigger'', and ''detector'', all keyed on a ''slaying'' string naming the required item. Across the map set, excluding editor, test, template, and unlinked directories:
 
   * **464 maps** contain at least one item-keyed gate.
-  * **5,689 item-keyed trigger altars** across **225 maps** - the "put the right thing on the right square" mechanism.
+  * **5,689 item-keyed trigger altars** across **225 maps** — the "put the right thing on the right square" mechanism.
   * **453 maps** contain a ''pedestal'', the same idea driven by weight rather than by item identity.
   * **389 of those trigger altars are ''invisible 1''**, across **12 maps**. The mechanism itself cannot be seen.
 
@@ -480,13 +480,13 @@ The obvious measurement is "gated maps containing no sign, book, rune, mouth, or
 
   * ''bookshelf'' matches a search for books and carries no text at all. Two of them sit in the worst example below and made it score as a map with teaching objects.
   * ''scorn/temples/gorokh_final'' contains a sign. It reads "Dungeon Master's Lounge."
-  * Guild maps are full of gates keyed on ''Stove'', ''Forge'', ''Cauldron'', and ''TanningDesk'' - crafting furniture, explained by the act of joining a guild, not really puzzles at all.
+  * Guild maps are full of gates keyed on ''Stove'', ''Forge'', ''Cauldron'', and ''TanningDesk'' — crafting furniture, explained by the act of joining a guild, not really puzzles at all.
 
 A useful audit has to check three things, not one: that a teaching object exists, that it is **near** the gate, and that its text actually **names the requirement**. The third is the only one that matters and the only one nobody has scanned for.
 
 ==== The bad case ====
 
-''mlab/citydeclouds/cwdcguestofmarquis1'' - "Guest of the Marquis", 64x63, ''difficulty 45''.
+''mlab/citydeclouds/cwdcguestofmarquis1'' — "Guest of the Marquis", 64x63, ''difficulty 45''.
 
 Five unremarkable squares near the middle of the map carry **45 stacked trigger altars**, every one of them ''invisible 1'', each named after a creature and keyed to a different item:
 
@@ -502,13 +502,13 @@ connected 66685
 end
 </code>
 
-The full demand list across those five squares runs to gold nuggets, sulphur, ruby, bat wing, four different colours of rose, a demon's head, mint, salt, an apple, a mace, and a rock. The map contains no sign, no ''magic_mouth'', no ''rune_mark'', no NPC ''@match'' dialogue, and no readable book - the only two book-shaped objects are scenery bookshelves with no message. Nothing anywhere on the map indicates that those squares are different from any other square, let alone which of a dozen items each one wants.
+The full demand list across those five squares runs to gold nuggets, sulphur, ruby, bat wing, four different colours of rose, a demon's head, mint, salt, an apple, a mace, and a rock. The map contains no sign, no ''magic_mouth'', no ''rune_mark'', no NPC ''@match'' dialogue, and no readable book — the only two book-shaped objects are scenery bookshelves with no message. Nothing anywhere on the map indicates that those squares are different from any other square, let alone which of a dozen items each one wants.
 
 This is the article's "don't" in its purest available form. The mechanism is invisible, the requirement is unguessable, and there is no in-game path to the answer. A player either has the wiki open or they do not finish the map.
 
 ==== The good case ====
 
-''wolfsburg/shops/transport.shoppe'' uses **the same hidden mechanism** - 11 invisible item-keyed altars taking payment - and is completely legible, because it also carries a numbered sign, two magic mouths, and NPC dialogue:
+''wolfsburg/shops/transport.shoppe'' uses **the same hidden mechanism** — 11 invisible item-keyed altars taking payment — and is completely legible, because it also carries a numbered sign, two magic mouths, and NPC dialogue:
 
 <code>
 Information on using our teleporters
@@ -522,17 +522,17 @@ Same engine feature, opposite outcome. This is the whole argument in two maps: i
 
 ==== The middle case ====
 
-''scorn/temples/gorokh_final'' has an altar keyed to ''apple'', and an apple placed somewhere on the map. Four magic mouths deliver atmosphere - "Only the Advocate may enter", "Gorokh has noticed you" - and not one of them mentions the apple or the altar.
+''scorn/temples/gorokh_final'' has an altar keyed to ''apple'', and an apple placed somewhere on the map. Four magic mouths deliver atmosphere — "Only the Advocate may enter", "Gorokh has noticed you" — and not one of them mentions the apple or the altar.
 
 This one is nearly fine. The required item is physically present, so a thorough player can solve it by experiment, which makes it a puzzle rather than a lockout. But the map already has four mouths, and one more sentence in any of them would turn "I wandered around picking things up" into "I worked out what the temple wanted." The cost of the fix is a line of text in a file that already exists.
 
 ==== The common shapes and what to do about each ====
 
-**The unmarked trigger square.** Invisible ''altar_trigger'' or ''pedestal'' with no visual difference from its neighbours. Fix: make it visible, or leave it invisible and mark the floor around it - a rune, a mosaic, scorch marks, a body slumped against the wall holding the right item. The mechanism can stay hidden as long as the //location// is not.
+**The unmarked trigger square.** Invisible ''altar_trigger'' or ''pedestal'' with no visual difference from its neighbours. Fix: make it visible, or leave it invisible and mark the floor around it — a rune, a mosaic, scorch marks, a body slumped against the wall holding the right item. The mechanism can stay hidden as long as the //location// is not.
 
 **The unguessable ingredient.** A gate keyed to a specific item with nothing naming it. Fix: name it somewhere reachable. A previous petitioner's journal, an NPC who complains about the price of roses, a mouth that says what the last person tried and how it went. Attach ''knowledge_marker'' so the answer survives the session.
 
-**The off-map answer.** The solution is written down, in a different map, with nothing connecting them. This is the most defensible of the four and still needs a thread - a rumour, a torn page, an NPC who names the town.
+**The off-map answer.** The solution is written down, in a different map, with nothing connecting them. This is the most defensible of the four and still needs a thread — a rumour, a torn page, an NPC who names the town.
 
 **The untaught engine mechanic.** The puzzle needs marking runes, pushing objects, a specific spell, or the ''search'' skill, and the game never taught any of them. Fix: this is not a puzzle problem, it is the mechanic surface problem. Teach the mechanic somewhere survivable first, then a puzzle built on it is fair.
 
@@ -544,31 +544,31 @@ This one is nearly fine. The required item is physically present, so a thorough 
   - Scenery does not count. A ''bookshelf'' is furniture; only a readable with a ''msg'' teaches anything.
   - Where the answer lives on another map, put a thread between them.
 
-The audit that would find the remaining cases is not the one already built - it needs proximity and text matching, not just object counts. But it is the same scan, and the 12 maps with invisible item-keyed altars are a short enough list to review by hand this afternoon.
+The audit that would find the remaining cases is not the one already built — it needs proximity and text matching, not just object counts. But it is the same scan, and the 12 maps with invisible item-keyed altars are a short enough list to review by hand this afternoon.
 
 ===== Adrenaline pacing and backward callbacks, expanded =====
 
-These get named together in the source article and they are not the same job. **Adrenaline pacing** is intensity over time inside a single run - the rise and fall that makes the peaks feel like peaks. **Backward callbacks** are content that reaches back to something the player already met and re-frames it with what they have since gained. One is map layout, the other is the quest system, and they have different owners in this project.
+These get named together in the source article and they are not the same job. **Adrenaline pacing** is intensity over time inside a single run — the rise and fall that makes the peaks feel like peaks. **Backward callbacks** are content that reaches back to something the player already met and re-frames it with what they have since gained. One is map layout, the other is the quest system, and they have different owners in this project.
 
-==== Crossfire opens at full intensity, and it is measurable ====
+==== Crossfire opens with no run-up, and it is measurable ====
 
-The claim at the top of these notes - that most dungeons open at full intensity on room one - turns out to be checkable. Taking every non-overworld map with at least one hostile monster and measuring the distance from the map's declared entry point to the nearest one:
+The claim at the top of these notes — that most dungeons open at full intensity on room one — turns out to be checkable, and the data refines it: the opening is not especially //intense//, it is simply immediate. Taking every non-overworld map with at least one hostile monster and measuring the distance from the map's declared entry point to the nearest one:
 
   * **1,062 maps** qualify, excluding the world tiles, editor, test, template, and unlinked directories.
   * The **median distance to the first hostile is 5 tiles**.
   * 35 percent have one within 3 tiles, 59 percent within 5, 79 percent within 8, and 90 percent within 12.
   * Median dungeon or town map area is 484 tiles, roughly 22x22, and 45 percent are 20x20 or smaller.
-  * Median monster density is 1.9 per 100 tiles, which is not high - the monsters are not crowded, they are just //immediately// present.
+  * Median monster density is 1.9 per 100 tiles, which is not high — the monsters are not crowded, they are just //immediately// present.
 
 Five tiles is inside the player's view on arrival. There is no vestibule, no approach, no beat where the player reads the room. The map starts and the fight starts.
 
-NOTE: the measurement is Chebyshev distance and knows nothing about walls, so a monster three tiles away behind a wall counts the same as one in the corridor. It also counts a monster as hostile unless its archetype or its map instance sets ''friendly'' or ''unaggressive'', which will still misfile a few caged or scripted NPCs. The numbers are a floor for the effect, not a precise census - but the direction is not in doubt, and the same scan run per region would show which map sets are worst.
+NOTE: the measurement is Chebyshev distance and knows nothing about walls, so a monster three tiles away behind a wall counts the same as one in the corridor. It also counts a monster as hostile unless its archetype or its map instance sets ''friendly'' or ''unaggressive'', which will still misfile a few caged or scripted NPCs. The numbers are a floor for the effect, not a precise census — but the direction is not in doubt, and the same scan run per region would show which map sets are worst.
 
 ==== What pacing looks like in map terms ====
 
 The article's saw shape needs somewhere to dip, and a 20x20 map with monsters five tiles from the door has nowhere. Concrete devices, all map-side:
 
-**The vestibule.** Three to five tiles of nothing between the entrance and the first threat. It costs almost no space and it is the single cheapest change on this list. The player arrives, sees the room, and chooses to advance - which turns the first fight from an ambush into a decision.
+**The vestibule.** Three to five tiles of nothing between the entrance and the first threat. It costs almost no space and it is the single cheapest change on this list. The player arrives, sees the room, and chooses to advance — which turns the first fight from an ambush into a decision.
 
 **The breather room.** A lit, monster-free room in the middle of the dungeon. No treasure required, no puzzle, nothing to do but stand still and let spell points come back. The absence of threat is the content. NOTE: keep wandering monsters and generators out of it, or it is not a breather.
 
@@ -603,7 +603,7 @@ end_setwhen
 end_step
 </code>
 
-Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**, a median of 5 steps each, with ''scorn/CoffeeGoose'' the longest at 12. But there are only **24 ''setwhen'' blocks and 15 ''parent'' declarations, spread across 4 of the 21 files**. The cross-quest conditional - the one feature that makes a chain a chain rather than a list - is used by well under a tenth of the content.
+Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**, a median of 5 steps each, with ''scorn/CoffeeGoose'' the longest at 12. But there are only **24 ''setwhen'' blocks and 15 ''parent'' declarations, spread across 4 of the 21 files**. The cross-quest conditional — the one feature that makes a chain a chain rather than a list — is used by well under a tenth of the content.
 
 **The constraint worth knowing before planning around this.** Quest state is advanced from Python, through ''cf_quest_start'' and ''cf_quest_set_player_state''; there is no map object that reads or writes it. So a callback where the //map itself// changes based on quest state needs a script, not just archetypes. Worse, ''python/CFDialog.py'' keeps its own per-player semaphore state that is separate from the quest system, so a lot of existing dialogue-driven progression is invisible to ''.quests'' entirely. Anybody building on this should decide which of the two state systems they are using before writing the first step.
 
@@ -611,11 +611,11 @@ Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**
 
 **The door you already walked past.** Put a locked or impassable feature early, in plain sight, and open it at a later quest step. The player has already built a memory of the place, so the return costs no explanation. This needs only a ''setwhen'' and something to flip the gate.
 
-**The monster that beat you, met again.** The article's version of this is re-using an obstacle once the player has the tool for it. In Crossfire terms: the fire immune thing in the level 5 dungeon, met again at level 20 in a wing that was sealed the first time. It also completes the teaching started in the earlier map, which ties this to the mechanic surface section - a mechanic taught once and re-tested later reads as a subject rather than a gimmick.
+**The monster that beat you, met again.** The article's version of this is re-using an obstacle once the player has the tool for it. In Crossfire terms: the fire immune thing in the level 5 dungeon, met again at level 20 in a wing that was sealed the first time. It also completes the teaching started in the earlier map, which ties this to the mechanic surface section — a mechanic taught once and re-tested later reads as a subject rather than a gimmick.
 
 **The NPC who remembers.** ''@match'' dialogue keyed on quest state, so the guard who turned you away at step 10 greets you by name at step 40. Cheap, and it does more for the sense of a persistent world than most map work.
 
-**The quest that reframes the first dungeon.** The strongest version, and the one nothing in the set currently does: a late quest whose steps send the player back through starting-area maps for a reason that was not visible the first time. It costs no new maps, which is the entire appeal.
+**The quest that reframes the first dungeon.** The strongest version, and one nothing in the set appears to do: a late quest whose steps send the player back through starting-area maps for a reason that was not visible the first time. It costs no new maps, which is the entire appeal.
 
 ==== Conventions worth adding to Info/mapguide ====
 
@@ -623,7 +623,7 @@ Now the usage. Across 21 ''.quests'' files there are **66 quests and 333 steps**
   - Every dungeon of more than two levels gets at least one monster-free, generator-free room.
   - Spend the monster budget in clusters with quiet between them, not spread evenly across the floor.
   - Do not place the exit adjacent to the final encounter.
-  - When building a chain, use ''parent'' and ''setwhen'' rather than a flat list of steps, and pick one state system - quest steps or dialogue semaphores - and stay in it.
+  - When building a chain, use ''parent'' and ''setwhen'' rather than a flat list of steps, and pick one state system — quest steps or dialogue semaphores — and stay in it.
 
 The entry-distance scan is about thirty lines and runs over the whole map set in seconds. Run per region, it produces a ranked list of the maps that open worst, which is a concrete work queue rather than an opinion about pacing.
 
@@ -635,13 +635,13 @@ This is the cheapest section on the page, and that is the surprise. Every other 
 
 The server exposes **19 global plugin events**. From ''include/events.h'' and the dispatch table in ''plugins/cfpython/cfpython.cpp'', the ones that matter for measurement are ''born'', ''death'', ''gkill'', ''login'', ''logout'', ''mapenter'', ''mapleave'', ''mapreset'', ''mapload'', ''mapready'', ''mapunload'', ''remove'', ''gbought'', ''gsold'', and ''clock''.
 
-Dispatch is by directory convention. The Python plugin looks in ''python/events/<eventname>/'' and runs every script it finds there - ''cfpython.cpp:1638''. No registration, no build step; drop in a ''.py'' file and it runs.
+Dispatch is by directory convention. The Python plugin looks in ''python/events/<eventname>/'' and runs every script it finds there — ''cfpython.cpp:1638''. No registration, no build step; drop in a ''.py'' file and it runs.
 
 Storage is solved too. ''python/CFSqlDb.py'' is eight lines that hand back a ''sqlite3'' connection to ''crossfire.db'' in the server's local directory. There is already a SQLite database sitting there.
 
 And the pattern is established. ''python/CFLog.py'' plus the scripts in ''python/events/'' already log births, logins, kicks, muzzles, and character removals to flat records.
 
-So: hooks, dispatch, storage, and precedent. Of the 19 event directories the plugin will look for, the map set uses 9. The ones nobody has created are ''mapenter'', ''mapleave'', ''mapreset'', ''logout'', and ''clock'' - which is very nearly an exact list of the article's monitoring asks.
+So: hooks, dispatch, storage, and precedent. Of the 19 event directories the plugin will look for, the map set uses 9. The ones nobody has created are ''mapenter'', ''mapleave'', ''mapreset'', ''logout'', and ''clock'' — which is very nearly an exact list of the article's monitoring asks.
 
 ==== Death locations: the script that does not exist ====
 
@@ -651,7 +651,7 @@ Two details make this work better than expected:
 
 **The event fires before the player is moved.** ''events_execute_global_event(EVENT_PLAYER_DEATH, op, killer)'' is at ''server/player.cpp:3575'', and ''enter_player_savebed()'' is not reached until deep inside ''kill_player_not_permadeath()''. The script sees the player standing on the square where they actually died, with their map, coordinates, level, and killer all intact.
 
-**Arena deaths are already excluded.** ''op_on_battleground()'' returns at ''player.cpp:3569'', before the event fires, so deaths in combat arenas never enter the stream. That is free data hygiene - nobody has to filter out the teamarena maps.
+**Arena deaths are already excluded.** ''op_on_battleground()'' returns at ''player.cpp:3569'', before the event fires, so deaths in combat arenas never enter the stream. That is free data hygiene — nobody has to filter out the teamarena maps.
 
 The record to write is small: timestamp, map path, x, y, player level, killer name, and a hashed player identifier. That is one script, one table, and it is the single highest-value thing on this entire page, because it converts every other argument here from taste into evidence.
 
@@ -659,13 +659,13 @@ The record to write is small: timestamp, map path, x, y, player level, killer na
 
 ''mapenter'' and ''mapleave'' are registered global events with no directory at all, which means nobody has ever measured how far into anything a player gets.
 
-Paired enter and leave records give the whole funnel: how many players entered a dungeon's first level, how many reached the second, how many reached the last, how long they stayed on each, and - the useful one - which level they were standing on when they left and did not come back. That is the article's completion drop-off, and it needs the same amount of work as the death script.
+Paired enter and leave records give the whole funnel: how many players entered a dungeon's first level, how many reached the second, how many reached the last, how long they stayed on each, and — the useful one — which level they were standing on when they left and did not come back. That is the article's completion drop-off, and it needs the same amount of work as the death script.
 
 NOTE: the noise is real and has to be handled up front. Reset cycles, relogs, players passing through a map on the way somewhere else, and DMs teleporting around will all generate events. Recording the player level and the session identifier alongside each event lets most of that be filtered later rather than never.
 
 ==== What else is sitting there unused ====
 
-**Live region occupancy.** ''whereabouts'' walks every region and reports how many players are in each - ''server/c_misc.cpp:495''. It is computed fresh each time and thrown away. Polling it on a schedule and appending the result gives a region popularity history with no server change whatsoever, which answers "which parts of the world does anybody actually visit" - a question nobody currently has data for.
+**Live region occupancy.** ''whereabouts'' walks every region and reports how many players are in each — ''server/c_misc.cpp:495''. It is computed fresh each time and thrown away. Polling it on a schedule and appending the result gives a region popularity history with no server change whatsoever, which answers "which parts of the world does anybody actually visit" — a question nobody currently has data for.
 
 **Session length.** ''login'' is logged, ''logout'' is not, so how long people play is unknown.
 
@@ -673,15 +673,15 @@ NOTE: the noise is real and has to be handled up front. Reset cycles, relogs, pl
 
 **Economy.** ''gbought'' and ''gsold'' both have working scripts already. Shop flow is measurable today.
 
-**Retention.** ''born'' and ''remove'' are both logged already. Nobody has ever joined them up to ask how many characters created in a given month were still being played a month later - which is the empirical version of the "who is this game for" question.
+**Retention.** ''born'' and ''remove'' are both logged already. Nobody has ever joined them up to ask how many characters created in a given month were still being played a month later — which is the empirical version of the "who is this game for" question.
 
 ==== The reports this produces ====
 
-  - **Death heatmap per map and coordinate** - the article's evenly-distributed-deaths test, with real data.
-  - **Entry-to-completion funnel per dungeon** - which maps people start and do not finish.
-  - **Declared ''difficulty'' against observed deaths** - this closes the loop with the difficulty audit at the bottom of this page. A map declaring difficulty 5 that kills level 20 characters is mislabelled, and no static scan of monster exp can tell you that.
-  - **First-hostile distance against death rate** - directly tests the pacing claim measured earlier. If the maps that open at one tile are also the maps people abandon, that argument is settled.
-  - **New character retention** - born, login count, and remove, joined.
+  - **Death heatmap per map and coordinate** — the article's evenly-distributed-deaths test, with real data.
+  - **Entry-to-completion funnel per dungeon** — which maps people start and do not finish.
+  - **Declared ''difficulty'' against observed deaths** — this closes the loop with the difficulty audit at the bottom of this page. A map declaring difficulty 5 that kills level 20 characters is mislabelled, and no static scan of monster exp can tell you that.
+  - **First-hostile distance against death rate** — directly tests the pacing claim measured earlier. If the maps that open at one tile are also the maps people abandon, that argument is settled.
+  - **New character retention** — born, login count, and remove, joined.
 
 The third one is worth dwelling on. The difficulty audit compares a map's declared difficulty against its monster content, which is a static proxy for how hard it is. Death data measures how hard it //actually was//, for real players, at the levels they really were. Those two reports together are a far stronger tool than either alone, and they share a key: the map path.
 
@@ -706,23 +706,25 @@ None of the first three requires touching C++, a build, or a server restart beyo
 
 ===== What does not apply cleanly =====
 
-**Dynamic difficulty adjustment ("magic sauce").** In a persistent multiplayer game with a shared economy, scaling difficulty to the individual breaks exp and loot fairness and is trivially exploitable — deliberately underperform, get an easier run at the same reward. Crossfire already has the defensible version of this: random maps that scale by difficulty parameter, and party/level-scaled content.
+**Dynamic difficulty adjustment ("magic sauce").** In a persistent multiplayer game with a shared economy, scaling difficulty to the individual breaks exp and loot fairness and is trivially exploitable — deliberately underperform, get an easier run at the same reward. Crossfire already has the defensible version of this: random maps that scale by an author-set difficulty parameter. Expanded below.
 
-**"Never allow skipping unskilled sections."** Crossfire is an open world on purpose. You cannot enforce sequence, and trying to would be a worse game. The article's advice here is platformer-specific.
+**"Never allow skipping unskilled sections."** Crossfire is an open world on purpose. You cannot enforce sequence, and trying to would be a worse game. The article's advice here is platformer-specific. Expanded below.
 
 **Formal QA, expo testing, review sites.** No budget, no publisher, no funnel. The analog is a public test server plus new-player feedback threads. Expanded below.
 
 ===== What does not apply cleanly, expanded =====
 
-For each of these the useful question is not "does this port" - it does not - but "what is the local equivalent, and does it already exist." In all three cases something equivalent does exist and is underused. There is also a fourth category the original list missed, which is the most important thing in this section.
+For each of these the useful question is not "does this port" — it does not — but "what is the local equivalent, and does it already exist." In all three cases something equivalent does exist and is underused. There is also a fourth category the original list missed, which is the most important thing in this section.
 
 ==== Dynamic difficulty adjustment ====
 
 The objection stands: in a persistent game with a shared economy, scaling difficulty per player breaks exp and loot fairness and is trivially exploitable. Nothing below changes that.
 
-But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The procedurally generated content has the rising curve that the hand-built content does not** - which is a slightly embarrassing thing to have to write directly after measuring that 32 percent of hand-built dungeons are flat at every depth.
+But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The procedurally generated content has the rising curve that the hand-built content does not** — which is a slightly embarrassing thing to have to write directly after measuring that 32 percent of hand-built dungeons are flat at every depth.
 
 And it is almost entirely unused. Of **316 random-map entrances on the overworld**, ''difficulty_increase'' is set on exactly **one**. Another 153 declare ''dungeon_depth 1'', a single level, where no ramp is possible at all.
+
+NOTE: the first draft of the bullet above also credited Crossfire with "party/level-scaled content." There is no such thing. Nothing in the random map generator reads player level or party size — the difficulty of a random dungeon comes from the ''dungeon_level'' the map author typed into the exit, and it is the same for a level 2 character and a level 60 one. The scaling is authored, not adaptive, which is the point.
 
 So the local equivalent of the article's magic sauce is not adaptive scaling, it is: **use the scaling that already ships**. Setting ''dungeon_depth'' above 1 and ''difficulty_increase'' to something sensible is a per-entrance edit in a ''msg'' block, costs nothing, needs no engine work, and produces exactly the shape the article asks for in the one part of the game that can generate it automatically.
 
@@ -732,13 +734,13 @@ Correct that this is platformer-specific and that enforcing sequence would make 
 
 The substitute is to **inform rather than gate**. A player who walks into content twelve levels above them has not broken the game; they have made a decision without information. Two things convert that from a trap into a choice, and both are covered elsewhere on this page: signage at the entrance so the decision is informed, and a death penalty mild enough that being wrong is a setback rather than an evening lost.
 
-Worth noting that geography already provides soft sequencing - distance from Scorn correlates loosely with danger - and that this is the right kind of gating, because it is legible and the player can override it deliberately.
+Worth noting that geography already provides soft sequencing — distance from Scorn correlates loosely with danger — and that this is the right kind of gating, because it is legible and the player can override it deliberately.
 
 ==== Formal QA, expo testing, review sites ====
 
 No budget, no publisher, no funnel, all true. But "a public test server plus feedback threads" undersells what is available, because the map set is machine-readable and some of the tooling already ships with the server.
 
-  * **''utils/mapper''** generates web pages listing every map, item, monster, and region - and it does so as the server sees them, with random treasure resolved rather than left as markers. That is a QA pass over content that does not exist until generation time.
+  * **''utils/mapper''** generates web pages listing every map, item, monster, and region — and it does so as the server sees them, with random treasure resolved rather than left as markers. That is a QA pass over content that does not exist until generation time.
   * **''utils/maps-to-dot''** emits a GraphViz digraph of map interconnections per region, with nodes linking to Crossfire Atlas. NOTE: the exit-graph scan behind the difficulty saw section above duplicates this. Use the existing tool.
   * **111 unit test files** live under ''test/unit''. Automated testing is an established practice here, just not aimed at content.
   * The **monitoring** section is the funnel substitute. Completion drop-off per dungeon is the same measurement a publisher would buy from a playtest lab, taken from actual players instead.
@@ -747,7 +749,7 @@ The honest gap is not tooling and not testers. It is that nothing currently runs
 
 ==== The category the original list missed ====
 
-Some of the article's advice does not conflict with Crossfire's shape - it conflicts with Crossfire's **written policy**, which is a different problem and needs a different fix.
+Some of the article's advice does not conflict with Crossfire's shape — it conflicts with Crossfire's **written policy**, which is a different problem and needs a different fix.
 
 ''Info/mapguide'' is the project's own guide to what makes an acceptable map, and its rule 11 reads:
 
@@ -758,7 +760,7 @@ nor should the last monster be orders of magnitude more difficult
 than anything before it.
 </code>
 
-Read fairly, that rule is aimed at the unkillable-final-monster problem, and it explicitly allows monsters to increase in difficulty. But it has no concept of a deliberate //dip//, and its plain reading - keep difficulty about the same throughout - is the opposite of the saw. **The 32 percent of dungeons that are flat at every depth are not neglect. They are compliance.**
+Read fairly, that rule is aimed at the unkillable-final-monster problem, and it explicitly allows monsters to increase in difficulty. But it has no concept of a deliberate //dip//, and its plain reading — keep difficulty about the same throughout — is the opposite of the saw. **The 32 percent of dungeons that are flat at every depth are not neglect. They are compliance.**
 
 That reframes several findings on this page. Authors were told to do this. Any argument for the saw has to go through amending rule 11, not through persuading individual authors to quietly disagree with the guide.
 
@@ -782,13 +784,13 @@ inconsistency this rule is warning against.
 
 ==== What this section is really saying ====
 
-Two of the three "does not apply" items turn out to have a working local equivalent that nobody uses, and the third is a policy conflict rather than a design one. That is a better position than the original bullets implied - the gap between Crossfire and the article's advice is mostly unused capability and one paragraph in a text file, not missing systems.
+Two of the three "does not apply" items turn out to have a working local equivalent that nobody uses, and the third is a policy conflict rather than a design one. That is a better position than the original bullets implied — the gap between Crossfire and the article's advice is mostly unused capability and one paragraph in a text file, not missing systems.
 
 ===== What Crossfire should actually adopt =====
 
   - **Audit the ''difficulty'' header against map contents.** 3,281 of 3,282 maps declare a value and 58 percent of them declare exactly 1, which suppresses the server's own estimate and pins treasure to the floor. The field also drives shop stock, skill-ident exp, and hiding, so the audit must segment by map type before comparing anything. [[https://github.com/tannerrj/crossfire-map-audit|Crossfire Map Report]] already does the scanning half.
   - **Aggregate death locations.** Roll deaths up per map and per coordinate and the article's evenly-distributed-deaths test stops being an opinion. Everything else on this list gets easier once it exists.
-  - **Signal danger before the door.** 582 overworld entrances lead to a map containing monsters and 14 percent of them have a sign, magic mouth, or rune within three tiles. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is 500 maps long.
+  - **Signal danger before the door.** 582 overworld entrances lead to a map containing monsters and 14 percent of them have a sign, magic mouth, or rune within three tiles. [[https://github.com/tannerrj/crossfire-world-map-entrances|Crossfire World Map Entrances]] already enumerates entrances, so the coverage gap is measurable and the queue is around 500 entrances long.
   - **Teach at the point of need, using the modalities that already exist.** Signs, marking runes, magic mouths, books, NPC ''@match'' dialogue, and ''knowledge_marker'' are all in the engine today and underused (map ''msg'' and region ''msg'' only surface on ''mapinfo'' and ''whereami'', so they are flavour rather than teaching). A monster with an immunity that matters should have a corpse, a book, or a rambling NPC nearby that says so.
   - **Give each dungeon a teaching room.** If a map's gimmick is spell-reflecting monsters, invisibility, or a timed gate, room one should demonstrate it somewhere survivable. This is a map-authoring convention, not code — worth writing into ''Info/mapguide''.
   - **Keep doing what the recent altar work does.** The last several commits added second altars to temples for multi-player friendliness. That is the article's "player diversity" principle applied without being told to — reducing contention so different player populations can use the same content. The same instinct should extend to chokepoints in quest maps.
@@ -797,7 +799,7 @@ Two of the three "does not apply" items turn out to have a working local equival
 
 Both were in the first draft of these notes and both turned out to be wrong once the source was read.
 
-**"The server logs player deaths" - it does not.** In ''server/player.cpp:3576'' a string is built saying who died and how, and in the default non-permadeath configuration it is passed nowhere and discarded. There is no death log, no file, no counter. What exists instead is ''EVENT_PLAYER_DEATH'', a global plugin event, which is a better route anyway.
+**"The server logs player deaths" — it does not.** In ''server/player.cpp:3576'' a string is built saying who died and how, and in the default non-permadeath configuration it is passed nowhere and discarded. There is no death log, no file, no counter. What exists instead is ''EVENT_PLAYER_DEATH'', a global plugin event, which is a better route anyway.
 
 **The difficulty figure was a city-region sample.** Across the whole set it is not "1,120 of 1,220 set it by hand" but 3,281 of 3,282 declaring a value, of which 1,896 declare 1. That is a weaker claim about hand-tuning and a much stronger claim about the field being meaningless.
 
@@ -805,13 +807,13 @@ Both were in the first draft of these notes and both turned out to be wrong once
 
 Each expansion above ends with its own conventions. This is the sequence across all of them.
 
-**Tier 0 - no C++, no build, no restart beyond a plugin reload.**
+**Tier 0 — no C++, no build, no restart beyond a plugin reload.**
 
   - ''python/events/death/log_death.py'', writing to the SQLite database ''CFSqlDb.py'' already opens. The directory exists and holds one unrelated script. This is the single highest-value item on the page.
   - ''python/events/mapenter/'' and ''python/events/mapleave/'' with a daily roll-up, for the completion funnel. Neither directory exists.
   - A cron job polling ''whereabouts'' for per-region occupancy. Needs nothing from the server at all.
 
-**Tier 1 - text and data files.**
+**Tier 1 — text and data files.**
 
   - Rewrite ''lib/def_help'' to point at mechanics first and the command list second. It is currently eight lines about filing bugs.
   - Convert ''doc/survival-guide.txt'', ''doc/skills.txt'', and ''doc/runes-guide.txt'' into help topics. The text is written; this is editing.
@@ -819,7 +821,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
   - Add ''knowledge_marker'' to signs and books that already describe a monster, god, or recipe. Three files in the whole map set currently use it.
   - Amend ''Info/mapguide'' rule 11, which currently tells authors to keep difficulty flat and is the reason a third of dungeons are. Draft wording is in the section above.
 
-**Tier 2 - map work, with a queue the scans already produce.**
+**Tier 2 — map work, with a queue the scans already produce.**
 
   - Sign the 500-odd unsigned entrances to monster-bearing maps.
   - Review the 12 maps carrying invisible item-keyed trigger altars, starting with ''mlab/citydeclouds/cwdcguestofmarquis1''.
@@ -829,14 +831,14 @@ Each expansion above ends with its own conventions. This is the sequence across 
   - Give each temple whose god grants restoration an NPC or sign that says so. Ten of the eleven gods qualify.
   - Set ''dungeon_depth'' and ''difficulty_increase'' on the overworld's random-map entrances. 316 of them exist and one uses the ramp.
 
-**Tier 3 - small engine changes, each independently useful.**
+**Tier 3 — small engine changes, each independently useful.**
 
   - Print what the player lost when they die. The numbers are already computed; only the output is missing.
   - Put the exp loss on the gravestone, as that code's own comment has claimed for years.
   - Add two ''find_help_file_in("mischelp", ...)'' calls so topical help resolves. The category exists in ''help topics'' and the lookup ignores it.
   - ''death_penalty_skills'' and ''death_penalty_min_level'', both defaulting to current behaviour.
 
-**Tier 4 - prototype on a test server before committing.**
+**Tier 4 — prototype on a test server before committing.**
 
   - Soul recovery at the gravestone. Real multiplayer risk, real payoff.
   - Substitution tokens in help files so ''death.en'' can state this server's actual numbers.
@@ -845,7 +847,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
 
 Tier 0 is first because it is the only tier that produces //evidence//, and every argument on this page is currently an argument about taste. Death locations and completion funnels turn "that dungeon feels unfair" into a ranked list. They also validate the static scans: the difficulty audit says a map //should// be hard, the death data says whether it //was//, and those two joined on the map path are worth far more than either alone.
 
-Tier 1 is second because it is the cheapest real improvement available and it is bounded - a finite list of topics, most of them already drafted somewhere in ''doc/''.
+Tier 1 is second because it is the cheapest real improvement available and it is bounded — a finite list of topics, most of them already drafted somewhere in ''doc/''.
 
 Tiers 2 through 4 are ordered by who can do them without waiting for anybody. A map author can start Tier 2 this afternoon without touching the server; Tier 3 needs a build and a review; Tier 4 needs a decision that is not one person's to make.
 
