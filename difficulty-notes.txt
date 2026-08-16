@@ -4,6 +4,31 @@
 
 ===== What applies =====
 
+Seven of the article's ideas port to Crossfire more or less intact. Each is summarised here and then expanded in its own section below - the summaries are opinions, the expansions are where the source actually got read.
+
+==== The pattern that came out of writing them ====
+
+Going in, the expectation was that this would turn into a wishlist of engine features. It did not. In almost every case the capability already exists, ships today, and is sitting unused:
+
+  * Teaching objects - magic mouths, marking runes, ''knowledge_marker'' - are all in the engine. Three files in the entire map set use the last one.
+  * The server has a third help category for non-command topics, ''mischelp''. The directory does not exist and the lookup function does not search it.
+  * Nineteen global plugin events fire today, dispatched from a directory convention, with a SQLite database already open. The two hooks nobody has written are the two the article most wants.
+  * The quest format supports cross-quest conditions and parent chains. 24 ''setwhen'' blocks exist across 66 quests.
+  * The death penalty is tunable from a config file, and 10 of the 11 gods already cure its worst effect for free.
+  * The random map generator has a per-level difficulty ramp. It is set on 1 of 316 overworld entrances.
+
+So the gap between Crossfire and the article's advice is mostly unused capability and untaught mechanics - not missing systems. And in one case it is a rule in ''Info/mapguide'' telling authors to do the opposite of what the article recommends, which is a policy problem rather than a design one.
+
+==== On the numbers ====
+
+Figures come from scanning the map set, the archetype tree, and the server source rather than from the wiki, and file and line references are given so they can be checked. Where a scan has a known bias, it is stated next to the number - several do, and the caveat is usually more useful than the figure. Two of the claims in the first draft of these notes turned out to be wrong once the source was read; both corrections are in the adopt section at the end.
+
+==== What all of it is missing ====
+
+Every measurement here is static - what an author declared, what objects a map contains, how far the first monster is from the door. None of it measures what a player actually experienced. That is what the monitoring section is for, and it is why that work sits at the top of the list of things to build.
+
+==== The list ====
+
 **The "difficulty saw" instead of a curve.** This is the article's core idea and it applies cleanly at the //map-set// level, not the game level. Crossfire has no global curve — it is an open world where a level 3 character can walk out of Scorn and into something that kills them instantly. But every individual dungeon, tower, or quest chain is a small linear experience, and those absolutely should dip when they introduce their gimmick and then rise. Most Crossfire dungeons open at full intensity on room one. Expanded below.
 
 **The definition of "new mechanic" is where Crossfire is worst hit.** The article counts new enemy types, new abilities, new item rules, and old mechanics used in novel ways. Crossfire's mechanic surface is enormous — skills, praying and god-granted powers, spell paths, resistances and immunities, item power limits, alchemy, marking runes, dragon players, weapon improvement — and the game teaches almost none of it in-game. The de facto teaching modality is the wiki and asking on IRC. That is exactly the failure the article describes. Expanded below.
