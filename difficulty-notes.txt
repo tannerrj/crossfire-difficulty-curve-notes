@@ -1,10 +1,24 @@
 ====== Difficulty Curves (davetech.co.uk) Applied to Crossfire ======
 
-[[https://www.davetech.co.uk/difficultycurves|The article]] is written for linear single-player platformers, so some of it maps onto Crossfire directly and some of it fights Crossfire's basic shape. Here is the split.
+[[https://www.davetech.co.uk/difficultycurves|The article]] argues that difficulty should not be a smooth rising curve but a saw. Every time a game introduces something new, intensity drops so the player has room to learn it, then climbs past the previous peak, and the next introduction drops it again. Around that core idea it collects a set of rules: teach a mechanic rather than hiding it behind a puzzle, do not answer failure by making the game harder, accept that no single game suits everybody and pick who yours is for, pace intensity deliberately, reach back to earlier obstacles once the player has new tools, and above all measure what players actually do rather than trusting the designer's own sense of how hard something is.
+
+It is written for linear single-player platformers made by studios with a publisher and a QA budget. Crossfire is a 30-year-old open-world multiplayer roguelike with neither. Some of the advice therefore maps across directly, some of it fights the basic shape of the game, and a surprising amount of it turns out to describe things Crossfire already has and does not use. Here is the split.
+
+**These are notes, not a proposal.** Nothing here has been agreed with anyone and no code has been written. Where the honest conclusion is "somebody has to decide this," it says so instead of deciding.
+
+===== How to read this =====
+
+Three sections, and each bullet in the first two has its own expanded section following it:
+
+  * **What applies** - the seven ideas that port, and what the map set and server source actually look like when you check them.
+  * **What does not apply cleanly** - three that do not, plus the local equivalent each one already has.
+  * **What Crossfire should actually adopt** - the six-item list from the original notes, now sequenced into tiers by what unblocks what.
+
+The bullets are short and were written first. The expansions came from reading the server, the archetypes, and the maps, and they are where the numbers and the file references live. Where the two disagree, the expansion is right - two claims in the original bullets did not survive contact with the source, and both corrections are called out in the adopt section.
+
+**The short version.** Crossfire does not need new systems to address most of what this article describes. It needs the capability it already ships to be used, the mechanics it already has to be explained in-game, one paragraph of ''Info/mapguide'' amended, and - before any of the arguing about maps - one Python script that records where players die.
 
 ===== What applies =====
-
-Seven of the article's ideas port to Crossfire more or less intact. Each is summarised here and then expanded in its own section below - the summaries are opinions, the expansions are where the source actually got read.
 
 ==== The pattern that came out of writing them ====
 
@@ -21,7 +35,7 @@ So the gap between Crossfire and the article's advice is mostly unused capabilit
 
 ==== On the numbers ====
 
-Figures come from scanning the map set, the archetype tree, and the server source rather than from the wiki, and file and line references are given so they can be checked. Where a scan has a known bias, it is stated next to the number - several do, and the caveat is usually more useful than the figure. Two of the claims in the first draft of these notes turned out to be wrong once the source was read; both corrections are in the adopt section at the end.
+Figures come from scanning the map set, the archetype tree, and the server source rather than from the wiki, and file and line references are given so they can be checked. Where a scan has a known bias, it is stated next to the number - several do, and the caveat is usually more useful than the figure.
 
 ==== What all of it is missing ====
 

@@ -14,6 +14,8 @@ A working analysis of [Dave Roberts' "Difficulty Curves"](https://www.davetech.c
 
 * **[difficulty-notes.txt](difficulty-notes.txt)** — the notes themselves, in DokuWiki markup.
 
+The short version: Crossfire does not need new systems to address most of what the source article describes. It needs the capability it already ships to be used, the mechanics it already has to be explained in-game, one paragraph of `Info/mapguide` amended, and — before any of the arguing about maps — one Python script that records where players die.
+
 Sections:
 
 * **What applies** — the seven ideas that port, plus the pattern that emerged from checking them: the capability usually already exists and is unused.
