@@ -15,3 +15,8 @@
 # Python bytecode from tools/difficulty-scan
 __pycache__/
 *.pyc
+
+# Scan output. Regenerate with: cd tools && ./difficulty-scan all --csv out/
+# Snapshots go stale as soon as the map set changes, so they are not tracked.
+tools/out/*
+!tools/out/.gitkeep

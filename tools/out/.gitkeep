@@ -1,0 +1,7 @@
+Scan output lands here. Nothing in this directory is tracked except this file.
+
+    cd tools && ./difficulty-scan all --csv out/
+
+Snapshots go stale the moment the map set changes, so treat them as working
+output rather than a record. To keep a baseline worth diffing against, copy a
+run somewhere outside the repo and date it.

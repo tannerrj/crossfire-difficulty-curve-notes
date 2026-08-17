@@ -36,6 +36,11 @@ A full run is about 15 seconds over ~3,300 maps.
 
 Useful flags: `--rows N` (0 for all), `--csv DIR`, `--quiet`, `--no-caveats`.
 
+`out/` is the conventional place to write to and is gitignored — snapshots go
+stale as soon as the map set changes, so they are working output rather than a
+record. Keep a dated copy outside the repo if you want a baseline to diff
+against.
+
 ## Reports
 
 | Report | Answers |
