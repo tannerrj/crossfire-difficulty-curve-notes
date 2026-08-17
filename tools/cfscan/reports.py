@@ -252,6 +252,12 @@ def entrance_signage(mapset, arches, radius=3, **_):
             destination = mapset.maps.get(target)
             if destination is None or not destination.hostiles(arches):
                 continue
+            # A hole leading to another overworld tile is not a dungeon door.
+            # Some of these are self-referential - a transition within one
+            # tile - and none of them need a warning, because whatever lives
+            # on the far side is visible as the player walks up to it.
+            if target.startswith("world"):
+                continue
             total += 1
             nearest = min(
                 (chebyshev(obj.x, obj.y, t.x, t.y) for t in teaching), default=None
@@ -299,6 +305,9 @@ def entrance_signage(mapset, arches, radius=3, **_):
             "Adjacent squares sharing a destination are one door: a five-tile "
             "building frontage is one signage job, not five. Two doors far "
             "apart on the same world tile stay separate even to the same map.",
+            "Exits from one overworld tile to another are excluded. They are "
+            "map-stitching rather than dungeon entrances, and some are "
+            "self-referential within a single tile.",
         ],
     )
 
