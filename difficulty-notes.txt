@@ -29,7 +29,7 @@ Going in, the expectation was that this would turn into a wishlist of engine fea
   * Nineteen global plugin events fire today, dispatched from a directory convention, with a SQLite database already open. The two hooks nobody has written are the two the article most wants.
   * The quest format supports cross-quest conditions and parent chains. 24 ''setwhen'' blocks exist across 66 quests.
   * The death penalty is tunable from a config file, and 10 of the 11 gods already cure its worst effect for free.
-  * The random map generator has a per-level difficulty ramp. It is set on 1 of 316 overworld entrances.
+  * The random map generator grades every dungeon it makes, by default, and has done for twenty years. The hand-built maps are the ones that do not.
 
 So the gap between Crossfire and the article's advice is mostly unused capability and untaught mechanics — not missing systems. And in one case it is a rule in ''Info/mapguide'' telling authors to do the opposite of what the article recommends, which is a policy problem rather than a design one.
 
@@ -752,15 +752,25 @@ For each of these the useful question is not "does this port" — it does not �
 
 The objection stands: in a persistent game with a shared economy, scaling difficulty per player breaks exp and loot fairness and is trivially exploitable. Nothing below changes that.
 
-But Crossfire's defensible version is better built than the bullet above suggests. The random map generator's parameter block carries ''difficulty'', ''dungeon_level'', ''dungeon_depth'', and ''difficulty_increase'', and ''random_maps/random_map.cpp:90'' derives difficulty from the dungeon level, optionally multiplied by the increase factor. **The generator has a declared, per-level difficulty ramp — the one thing the hand-built dungeons were measured above as almost never having.**
+But Crossfire's defensible version is better built than the bullet above suggests, and better built than three drafts of this section managed to describe. From ''random_maps/random_map.cpp:90'':
 
-And it is almost entirely unused. Of the 343 random-map entrances in the set, 157 are doors into buildings and 94 are the generic ''exit'' object that gives no clue what it leads to. That leaves **92 genuine descents — holes, cave mouths, stairs, ladders — with a median ''dungeon_depth'' of 2 and some as deep as 30 and 99. Exactly one of the 92 sets ''difficulty_increase''.** The rest generate every level of a multi-level dungeon at the same difficulty.
+<code>
+if (RP->difficulty == 0) {
+    RP->difficulty = RP->dungeon_level;          /* default: 1:1 with depth */
+    if (RP->difficulty_increase > 0.001)
+        RP->difficulty = (int)(RP->dungeon_level * RP->difficulty_increase);
+}
+</code>
 
-NOTE: an earlier draft of this section claimed nearly half of all entrances declare ''dungeon_depth 1'' and so cannot ramp. That was wrong, and the way it was wrong is worth keeping. Those are houses, and ''dungeon_depth 1'' is the //correct// setting for a front door — the number only looked alarming because the scan counted buildings as failed dungeons. Segmenting by entrance type dropped the queue from 158 to zero: no building has a depth above 1, no unclassified exit has depth 1, and the single depth-1 descent is a ladder into a cellar in a map called "The Random House". The map set is internally consistent here. The unused //ramp// is the real finding; the missing //depth// was an artefact of the measurement.
+and thirty lines later, ''RP->dungeon_level += 1'' for each level generated, written into the down staircase's parameters for the next one.
 
-NOTE: the first draft of the bullet above also credited Crossfire with "party/level-scaled content." There is no such thing. Nothing in the random map generator reads player level or party size — the difficulty of a random dungeon comes from the ''dungeon_level'' the map author typed into the exit, and it is the same for a level 2 character and a level 60 one. The scaling is authored, not adaptive, which is the point.
+**So a random dungeon ramps by default.** Difficulty equals depth unless somebody overrides it, and a 30-level descent generates level 1 at difficulty 1 and level 30 at difficulty 30 with nothing set at all. ''difficulty_increase'' is a //rate multiplier//, not a switch: 1.0 changes nothing, above 1.0 steepens the climb, and below 1.0 flattens it. The single entrance in the whole map set that sets it uses 0.5, which halves its ramp.
 
-So the local equivalent of the article's magic sauce is not adaptive scaling, it is: **use the ramp that already ships**. Adding ''difficulty_increase'' to the 91 deep entrances that lack it is a one-line edit per entrance in a ''msg'' block, costs nothing, needs no engine work, and produces exactly the shape the article asks for in the one part of the game that can generate it automatically. The depths are already there — a 30-level dungeon that generates all 30 levels at the same difficulty is one line away from being a staircase.
+That is the opposite of a gap. Of the 343 random-map entrances, 157 are doors into buildings and 94 are the generic ''exit'' object that gives no clue what it leads to; the remaining **92 genuine descents — holes, cave mouths, stairs, ladders, median depth 2 and some 30 and 99 levels deep — every one of them already produces a rising curve.** The procedurally generated content is not merely capable of the shape the hand-built content lacks. It has been generating it automatically the whole time, while 43 of 75 hand-built dungeons rise and never dip and four are flat.
+
+NOTE: three separate claims in earlier drafts of this section were wrong, and they failed the same way, which is worth more than any of them individually. The bullet credited Crossfire with "party/level-scaled content" — no such thing exists; nothing in the generator reads player level or party size. A later draft said nearly half of entrances declare ''dungeon_depth 1'' and so cannot ramp — those are houses, where depth 1 is correct, and segmenting entrances by kind dropped that queue from 158 to zero. This draft said the ramp was almost entirely unused and wanted adding to 91 entrances — it is the default, and adding it at 1.0 would have done nothing while any lower value would have flattened dungeons that already work. **Every one of the three came from reading parameter names and inferring behaviour instead of reading the code that consumes them.** The parameter block is legible and the semantics are not.
+
+So the local equivalent of the article's magic sauce is not adaptive scaling and not a missing ramp. It is that Crossfire already solved this problem in the one place it could be solved automatically, and the lesson sits in the hand-built content: a generator written twenty years ago grades its dungeons, and the maps people write by hand do not.
 
 ==== Never allow skipping unskilled sections ====
 
@@ -863,7 +873,7 @@ Each expansion above ends with its own conventions. This is the sequence across 
   - Add a vestibule to the maps whose first hostile is within one or two tiles of the entry point.
   - Put savebeds near the major dungeon clusters, and a cure sign beside each one.
   - Give each temple whose god grants restoration an NPC or sign that says so. Ten of the eleven gods qualify.
-  - Add ''difficulty_increase'' to the 91 multi-level random-map descents that lack it. Their depths are already set — some 30 and 99 levels — and every level currently generates at the same difficulty.
+  - Nothing on the random-map generator. It already grades its dungeons by default; three drafts of this page said otherwise and all three were wrong.
 
 **Tier 3 — small engine changes, each independently useful.**
 
